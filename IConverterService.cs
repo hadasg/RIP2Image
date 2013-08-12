@@ -30,7 +30,7 @@ namespace GhostscriptService
 {
 	[ServiceContract(Namespace = "GhostscriptService")]
     public interface IConverterService
-    { 
+		{ 
 
 		/// <summary>
 		/// Convert file type. 
@@ -40,7 +40,7 @@ namespace GhostscriptService
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		[OperationContract(Action = "GhostscriptService/ConvertPDF2JPG")]
-		bool ConvertPDF2JPG(string inConvertFilePath, string inTargetFilePath, double inQuality, double inResolutionX, double inResolutionY);
+		bool ConvertPDF2JPG(string inConvertFilePath, string inTargetFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to JPG.
@@ -53,6 +53,6 @@ namespace GhostscriptService
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		[OperationContract(Action = "GhostscriptService/ConvertPDFFolder2JPG")]
-		bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFoldersstring, double inQuality, double inResolutionX, double inResolutionY);
+		bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFoldersstring, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality);
     }
 }

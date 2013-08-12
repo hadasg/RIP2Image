@@ -25,11 +25,13 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Security.AccessControl;
 
 namespace GhostscriptService
 {
 	/// <summary>
-	/// Manage FileConvertor instances shard resource as thread safe. 
+	/// Manage FileConverter instances shard resource as thread safe. 
 	/// </summary>
 	internal class InstancesManager
 	{
@@ -41,12 +43,7 @@ namespace GhostscriptService
 		/// <summary>
 		/// Instances shard resource - thread safe.
 		/// </summary>
-		static private ConcurrentBag<FileConverter> m_ConvertorInstances = new ConcurrentBag<FileConverter>();
-
-		/// <summary>
-		/// 
-		/// </summary>
-		static private System.Threading.Semaphore m_Semaphore = new System.Threading.Semaphore(1, 1);
+		static private ConcurrentBag<FileConverter> m_ConverterInstances = new ConcurrentBag<FileConverter>();
 
 		/// <summary>
 		/// Returns available FileConvertor from ConcurrentBag collection if there is any.
@@ -55,21 +52,33 @@ namespace GhostscriptService
 		/// <returns></returns>
         static public FileConverter GetObject()
         {
-			m_Semaphore.WaitOne();
-            FileConverter fileConvertor;
-            if (!m_ConvertorInstances.TryTake(out fileConvertor))
-				fileConvertor = new FileConverter();
-			return fileConvertor;
+            FileConverter fileConverter;
+            if (!m_ConverterInstances.TryTake(out fileConverter))
+				fileConverter = new FileConverter();
+			return fileConverter;
         }
 		
 		/// <summary>
 		/// Return used FileConvertor to ConcurrentBag collection.
 		/// </summary>
-		/// <param name="item"></param>
-		static public void PutObject(FileConverter item)
+		/// <param name="inFileConvertor"></param>
+		static public void PutObject(FileConverter inFileConvertor)
         {
-            m_ConvertorInstances.Add(item);
-			m_Semaphore.Release();
+            m_ConverterInstances.Add(inFileConvertor);
         }
+
+		/// <summary>
+		/// Delete dynamic loading dlls and their directory.
+		/// </summary>
+		static public void DeleteDynamicLoadingDLL()
+		{
+			// Cleanup converter instances, which also delete their dll file member. 
+			FileConverter fileConverter;
+			while (m_ConverterInstances.TryTake(out fileConverter))
+				fileConverter.Cleanup();
+
+			// Delete dlls's directory
+			GhostscriptWrapper.DeleteDllDirectory();
+		}
 	}
 }

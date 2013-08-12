@@ -98,9 +98,15 @@ namespace GhostscriptService
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		/// <returns>True if conversion succeeded</returns>
-		public bool Convert(string inPathFileToConvert, string inOutputFileFullPath, double inQuality = 75, double inResolutionX = 72, double inResolutionY = 72)
+		public bool Convert(string inPathFileToConvert, string inOutputFileFullPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
+
+			// Determine rasterisation graphic quality - values are 1, 2 or 4.
+			ConvertPDF2JPGCommand.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine rasterisation text quality - values are 1, 2 or 4.
+			ConvertPDF2JPGCommand.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
 
 			// Determine file quality the range is 0-100.
 			ConvertPDF2JPGCommand.Append("mark /JPEGQ " + inQuality + " currentdevice putdeviceprops ");

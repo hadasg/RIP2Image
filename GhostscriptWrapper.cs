@@ -23,6 +23,7 @@ COPYRIGHT (C) 2013 Hadas Groisman & Amit Cohen.
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 
 namespace GhostscriptService
 {
@@ -31,84 +32,80 @@ namespace GhostscriptService
 	/// </summary>
 	internal class GhostscriptWrapper
 	{
-
-		#region Ghostscript 64 bit import Dll
+		
+		#region Native methods import Dll
 
 		/// <summary>
-		/// Ghostscript64 - Generate new instance of Ghostscript.
+		/// Returns a handle to the dll in question.
+		/// </summary>
+		/// <param name="dllToLoad"></param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll")]
+		public static extern IntPtr LoadLibrary(string dllToLoad);
+
+		/// <summary>
+		/// Obtain the address of an exported function within the previously loaded dll.
+		/// </summary>
+		/// <param name="hModule"></param>
+		/// <param name="procedureName"></param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll")]
+		public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+
+		/// <summary>
+		/// Releases the DLL loaded by the LoadLibrary function.
+		/// </summary>
+		/// <param name="hModule"></param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll")]
+		public static extern bool FreeLibrary(IntPtr hModule);
+
+		#endregion
+
+
+		#region Ghostscript import Dll
+
+		/// <summary>
+		/// Generate new instance of Ghostscript.
 		/// </summary>
 		/// <param name="pinstance"></param>
 		/// <param name="caller_handle"></param>
 		/// <returns></returns>
-		[DllImport("gsdll64.dll", EntryPoint = "gsapi_new_instance")]
-		private static extern int CreateNewGhostscriptInstance64(out IntPtr pinstance, IntPtr caller_handle);
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate int CreateNewGhostscriptInstance(out IntPtr pinstance, IntPtr caller_handle);
 
-		/// <summary>Ghostscript64 - Inisilaize Ghostscript arguments</summary>
+
+		/// <summary>Inisilaize Ghostscript arguments.</summary>
 		/// <param name="instance"></param><param name="argc"></param><param name="argv"></param>
 		/// <returns>0 if is ok</returns>
-		[DllImport("gsdll64.dll", EntryPoint = "gsapi_init_with_args")]
-		private static extern int InitInstanceWithArgs64(IntPtr instance, int argc, IntPtr argv);
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate int InitInstanceWithArgs(IntPtr instance, int argc, IntPtr argv);
 
-		/// <summary>Ghostscript64 - Exit the interpreter</summary>
+
+		/// <summary>ExitGSInstance the interpreter.</summary>
 		/// <param name="instance"></param><returns></returns>
-		[DllImport("gsdll64.dll", EntryPoint = "gsapi_exit")]
-		private static extern int Exit64(IntPtr instance);
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate int Exit(IntPtr instance);
 
-		/// <summary>Ghostscript64 - Destroy an instance of Ghostscript.</summary>
+
+		/// <summary>Destroy an instance of Ghostscript.</summary>
 		/// <param name="instance"></param>
-		[DllImport("gsdll64.dll", EntryPoint = "gsapi_delete_instance")]
-		private static extern void DeleteInstance64(IntPtr instance);
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate void DeleteInstance(IntPtr instance);
 
 		/// <summary>
-		/// Ghostscript64 - Run Ghostscript command.
+		/// Run Ghostscript command.
 		/// </summary>
-		/// <param name="instance"></param>
-		/// <param name="inString"></param>
+		/// <param name="gsInstance"></param>
+		/// <param name="commandString"></param>
 		/// <param name="user_errors"></param>
 		/// <param name="pexit_code"></param>
-		[DllImport("gsdll64.dll", EntryPoint = "gsapi_run_string")]
-		private static extern void RunCommandStringOnInstance64(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate void RunCommandStringOnInstance(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
 
 		#endregion
 
-		#region Ghostscript 32 bit import Dll
 
-		/// <summary>
-		/// Ghostscript32 - Generate new instance of Ghostscript.
-		/// </summary>
-		/// <param name="pinstance"></param>
-		/// <param name="caller_handle"></param>
-		/// <returns></returns>
-		[DllImport("gsdll32.dll", EntryPoint = "gsapi_new_instance")]
-		private static extern int CreateNewGhostscriptInstance32(out IntPtr pinstance, IntPtr caller_handle);
-
-		/// <summary>Ghostscript32 - Inisilaize Ghostscript arguments</summary>
-		/// <param name="instance"></param><param name="argc"></param><param name="argv"></param>
-		/// <returns>0 if is ok</returns>
-		[DllImport("gsdll32.dll", EntryPoint = "gsapi_init_with_args")]
-		private static extern int InitInstanceWithArgs32(IntPtr instance, int argc, IntPtr argv);
-
-		/// <summary>Ghostscript32 - Exit the interpreter</summary>
-		/// <param name="instance"></param><returns></returns>
-		[DllImport("gsdll32.dll", EntryPoint = "gsapi_exit")]
-		private static extern int Exit32(IntPtr instance);
-
-		/// <summary>Ghostscript32 - Destroy an instance of Ghostscript.</summary>
-		/// <param name="instance"></param>
-		[DllImport("gsdll32.dll", EntryPoint = "gsapi_delete_instance")]
-		private static extern void DeleteInstance32(IntPtr instance);
-
-		/// <summary>
-		/// Ghostscript32 - Run Ghostscript command.
-		/// </summary>
-		/// <param name="instance"></param>
-		/// <param name="inString"></param>
-		/// <param name="user_errors"></param>
-		/// <param name="pexit_code"></param>
-		[DllImport("gsdll32.dll", EntryPoint = "gsapi_run_string")]
-		private static extern void RunCommandStringOnInstance32(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
-
-		#endregion
 
 		#region Class Members
 
@@ -118,11 +115,86 @@ namespace GhostscriptService
 		private IntPtr m_Instance = IntPtr.Zero;
 
 		/// <summary>
-		/// Is 64 Bit Process?
+		/// Ghostscript dll path.
 		/// </summary>
-		bool m_is64BitProcess = Environment.Is64BitProcess;
+		private string m_GSDllPath;
+
+		/// <summary>
+		/// Pointer to dynamic loading DLL.
+		/// </summary>
+		private IntPtr m_LibraryPointerDll;
 
 		#endregion
+
+
+		#region Ghostscript Wrapper Functions
+
+		/// <summary>
+		///  Create new Ghostscript instance using Ghostscript import Dll.
+		/// </summary>
+		private void CreateNewGSInstance()
+		{
+			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_new_instance");
+			CreateNewGhostscriptInstance createNewGhostscriptInstance = (CreateNewGhostscriptInstance)Marshal.GetDelegateForFunctionPointer(
+																					pAddressOfFunctionToCall,
+																					typeof(CreateNewGhostscriptInstance));
+
+			createNewGhostscriptInstance(out m_Instance, IntPtr.Zero);
+		}
+
+		/// <summary>
+		/// Inisilaize Ghostscript instance with arguments using Ghostscript import Dll.
+		/// </summary>
+		/// <param name="inParametersLength"></param>
+		/// <param name="inArgvPointer"></param>
+		/// <returns></returns>
+		private int InitGSInstanceWithArgs(int inParametersLength, IntPtr inArgvPointer)
+		{
+			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_init_with_args");
+			InitInstanceWithArgs initInstanceWithArgs = (InitInstanceWithArgs)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(InitInstanceWithArgs));
+			return initInstanceWithArgs(m_Instance, inParametersLength, inArgvPointer);
+		}
+
+		/// <summary>
+		/// Exit Ghostscript Instance using Ghostscript import Dll.
+		/// </summary>
+		private void ExitGSInstance()
+		{
+			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_exit");
+			Exit exit = (Exit)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(Exit));
+			exit(m_Instance);
+		}
+
+		/// <summary>
+		/// Delete Ghostscript Instance using Ghostscript import Dll.
+		/// </summary>
+		private void DeleteGSInstance()
+		{
+			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_delete_instance");
+			DeleteInstance deleteInstance = (DeleteInstance)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(DeleteInstance));
+			deleteInstance(m_Instance);
+		}
+
+		/// <summary>
+		/// Run Ghostscript command using Ghostscript import Dll.
+		/// </summary>
+		/// <param name="inCommandPointer"></param>
+		/// <returns></returns>
+		private bool RunGSCommandStringOnInstance(IntPtr inCommandPointer)
+		{
+			IntPtr exitcode;
+
+			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_run_string");
+			RunCommandStringOnInstance runCommandStringOnInstance = (RunCommandStringOnInstance)Marshal.GetDelegateForFunctionPointer(
+																					pAddressOfFunctionToCall,
+																					typeof(RunCommandStringOnInstance));
+			runCommandStringOnInstance(m_Instance, inCommandPointer, 0, out exitcode);
+
+			return exitcode.Equals(IntPtr.Zero);
+		}
+
+		#endregion
+
 
 		#region Methods
 
@@ -153,11 +225,15 @@ namespace GhostscriptService
 		{
 			Cleanup();
 
-			// create Ghostscript instance.
-			if (m_is64BitProcess)
-				CreateNewGhostscriptInstance64(out m_Instance, IntPtr.Zero);
-			else
-				CreateNewGhostscriptInstance32(out m_Instance, IntPtr.Zero);
+			// Generate and load unique Dll 
+			m_GSDllPath = GenerateUniqueDll();
+			m_LibraryPointerDll = LoadLibrary(m_GSDllPath);
+			// Error report - couldn't load library
+			if (m_LibraryPointerDll == IntPtr.Zero)
+				return false;
+
+			// Create new Ghostscript instance.
+			CreateNewGSInstance();
 
 			// create the parameters as pinned allocated.
 			GCHandle[] parametersGCHandle = new GCHandle[inParameters.Length];
@@ -165,19 +241,16 @@ namespace GhostscriptService
 			IntPtr argvPointer = argsGCHandle.AddrOfPinnedObject();
 
 			// initialize the instance.
-			int initReturnValue;
-			if (m_is64BitProcess)
-				initReturnValue = InitInstanceWithArgs64(m_Instance, inParameters.Length, argvPointer);
-			else
-				initReturnValue = InitInstanceWithArgs32(m_Instance, inParameters.Length, argvPointer);
-			
+			int initReturnValue = InitGSInstanceWithArgs(inParameters.Length, argvPointer);
+
 			// clear memory.
 			for (int intCounter = 0; intCounter < parametersGCHandle.Length; intCounter++)
 				parametersGCHandle[intCounter].Free();
 			argsGCHandle.Free();
-			
+
 			return !(initReturnValue == -1);
 		}
+
 
 		/// <summary>
 		/// clean up Ghostscript instance memory.
@@ -186,16 +259,13 @@ namespace GhostscriptService
 		{
 			if (m_Instance != IntPtr.Zero)
 			{
-				if (m_is64BitProcess)
-				{
-					Exit64(m_Instance);
-					DeleteInstance64(m_Instance);
-				}
-				else
-				{
-					Exit32(m_Instance);
-					DeleteInstance32(m_Instance);
-				}
+				ExitGSInstance();
+
+				DeleteGSInstance();
+
+				// Free loaded library and delete Dll file. 
+				FreeLibrary(m_LibraryPointerDll);
+				File.Delete(m_GSDllPath);
 			}
 			m_Instance = IntPtr.Zero;
 		}
@@ -214,8 +284,6 @@ namespace GhostscriptService
 		/// <param name="command"></param>
 		public bool RunCommand(string inCommand)
 		{
-			IntPtr exitcode;
-
 			// convert parameters to byte
 			if (inCommand == null) inCommand = String.Empty;
 			object commandANSI = Encoding.Default.GetBytes(inCommand);
@@ -225,20 +293,43 @@ namespace GhostscriptService
 			IntPtr commandPointer = commandGCHandle.AddrOfPinnedObject();
 
 			//Run Ghostscript command
-			if (m_is64BitProcess)
-				RunCommandStringOnInstance64(m_Instance, commandPointer, 0, out exitcode);
-			else
-				RunCommandStringOnInstance32(m_Instance, commandPointer, 0, out exitcode);
-		
+			bool runGSCommandSucceed = RunGSCommandStringOnInstance(commandPointer);
+
 			// Clear Parameter
 			commandGCHandle.Free();
 
-			return exitcode.Equals(IntPtr.Zero);
+			return runGSCommandSucceed;
 		}
 
 		#endregion
 
 		#region Help Method
+
+		/// <summary>
+		///	Generate unique Dll and return its path. 
+		/// </summary>
+		public string GenerateUniqueDll()
+		{
+			string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
+
+			// The original dll.
+			string sourceFile = System.IO.Path.Combine(exeDirectory, "gsdll.dll");
+
+			// Create directory for the copy dll if there isn't.
+			string dllTargetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
+			if(!Directory.Exists(dllTargetPath))
+				System.IO.Directory.CreateDirectory(dllTargetPath);
+
+			// Generate unique name for the copied Dll.
+			string copyDllName = "gsdll" + Guid.NewGuid() + ".dll";
+			string destFile = System.IO.Path.Combine(dllTargetPath, copyDllName);
+			
+			// Copy. 
+			System.IO.File.Copy(sourceFile, destFile, true);
+
+			return destFile;
+		}
 
 		/// <summary>
 		/// Convert GS parameters to pointers in order to send them to GS functions.
@@ -271,5 +362,22 @@ namespace GhostscriptService
 
 		#endregion
 
+		#region Static Method
+
+		/// <summary>
+		/// Delete dlls's directory
+		/// </summary>
+		public static void DeleteDllDirectory()
+		{
+			string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
+			string targetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
+			if (Directory.Exists(targetPath))
+			{
+				System.IO.Directory.Delete(targetPath, true);
+			}
+		}
+
+		#endregion
 	}
 }

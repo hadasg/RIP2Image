@@ -47,25 +47,28 @@ namespace GhostscriptService
 		/// </summary>
 		/// <param name="inConvertFilePath"></param>
 		/// <param name="inNewFileTargetPath"></param>
-		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetPath, double inQuality, double resolutionX, double resolutionY)
+		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			bool conversionSucceed;
 
-			string OutputFileFullPath = PreFileConvert(inConvertFilePath, inNewFileTargetPath);
-			inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
+			conversionSucceed = CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 
-			// Make the conversion.
-			FileConverter fileConvertor = InstancesManager.GetObject();
-			conversionSucceed = fileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inQuality, resolutionX, resolutionY);
-			InstancesManager.PutObject(fileConvertor);
+			if (conversionSucceed)
+			{
+				string OutputFileFullPath = PreFileConvert(inConvertFilePath, inNewFileTargetPath);
+				inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
 
-			// Rename JPG names to the correct page counter.
-			RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
+				// Make the conversion.
+				FileConverter fileConvertor = InstancesManager.GetObject();
+				conversionSucceed = fileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+				InstancesManager.PutObject(fileConvertor);
 
+				// Rename JPG names to the correct page counter.
+				RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
+			}
 
 			return conversionSucceed;
 		}
-
 
 
 		/// <summary>
@@ -74,24 +77,33 @@ namespace GhostscriptService
 		/// <param name="inConvertFolderPath"></param>
 		/// <param name="inTargetFolderPath"></param>
 		/// <param name="inConvertFileWildCard"></param>
-		/// <param name="inDeleteSourcePDF"> true if want to delete source file </param>
+		/// <param name="inDeleteSourcePDF"> true if want to delete source file  </param>
 		/// <param name="inSearchSubFolders"> true if want to convert PDF files in subfolders </param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, double inQuality, double inResolutionX, double inResolutionY)
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		/// <returns></returns>
+		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			bool conversionSucceed;
 
-			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
-			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
-			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
-			//System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+			conversionSucceed = CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 
-			// Convert all files in folder.
-			FileConverter fileConvertor = InstancesManager.GetObject();
-			conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inQuality, inResolutionX, inResolutionY);
-			InstancesManager.PutObject(fileConvertor);
+			if (conversionSucceed)
+			{
+				inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
+				inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
+				System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+				//System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
+				// Convert all files in folder.
+				FileConverter fileConvertor = InstancesManager.GetObject();
+				conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+				InstancesManager.PutObject(fileConvertor);
+			}
+			
 			return conversionSucceed;
 		}
 
@@ -141,6 +153,42 @@ namespace GhostscriptService
 		}
 
 		/// <summary>
+		/// Check parameters validation.
+		/// </summary>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		/// <returns></returns>
+		private bool CheckParamValidation(double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		{
+			if (inResolutionX <= 0 || inResolutionY <= 0)
+			{
+				throw new System.ArgumentException("Resolution cannot be <= 0", "original");
+				//throw new Exception("Resolution has to be > 0");
+				return false;
+			}
+			else if (!(inGraphicsAlphaBitsValue == 1 || inGraphicsAlphaBitsValue == 2 || inGraphicsAlphaBitsValue == 4))
+			{
+				throw new Exception("GraphicsAlphaBits values are 1, 2 or 4");
+				return false;
+			}
+			else if (!(inTextAlphaBitsValue == 1 || inTextAlphaBitsValue == 2 || inTextAlphaBitsValue == 4))
+			{
+				throw new Exception("TextAlphaBits values are 1, 2 or 4");
+				return false;
+			}
+			else if (inQuality < 0 || inQuality > 100)
+			{
+				throw new Exception("File quality range is 0-100");
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Walking traverse all folders under inRoot looking for appropriate files which their type need to convert to inNewFileType. 
 		/// While find one convert it and put it under the same folder if inSameTrgetFolder==true, otherwise creating a folder under inTargetFolderPath with the
 		/// same name as the original file located on.
@@ -154,7 +202,7 @@ namespace GhostscriptService
 		/// <param name="inSameTrgetFolder"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		private bool WalkDirectoryTree(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, double inQuality, double inResolutionX, double inResolutionY)
+		private bool WalkDirectoryTree(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			bool fileConversion;
 
@@ -179,7 +227,7 @@ namespace GhostscriptService
 					string inConvertFilePath = file.FullName;
 					string OutputFileFullPath = PreFileConvert(inConvertFilePath, inTargetFolderPath);
 					inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
-					fileConversion = inFileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inQuality, inResolutionX, inResolutionY);
+					fileConversion = inFileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 					if(!fileConversion)
 						return false;
 
@@ -206,12 +254,12 @@ namespace GhostscriptService
 							//Create the sub folder
 							System.IO.Directory.CreateDirectory(newPath);
 							//Recursive call for each subdirectory.
-							WalkDirectoryTree(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inQuality, inResolutionX, inResolutionY);
+							WalkDirectoryTree(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 						}
 						else
 						{
 							// Recursive call for each subdirectory.
-							WalkDirectoryTree(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inQuality, inResolutionX, inResolutionY);
+							WalkDirectoryTree(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 						}
 
 					}
@@ -236,7 +284,7 @@ namespace GhostscriptService
 			int filesCounter = 1;
 			foreach (string fileName in filesNameWithTheSamePrefix)
 			{
-				if (!fileName.Contains(".pdf"))
+				if (fileName.Contains(".jpg"))
 				{
 					string fileNewName = inFileDir + "\\" + GetFileName(inFileFullName) + "-" + filesCounter + ".jpg";
 					// Rename file.

@@ -7,6 +7,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.ServiceModel;
+using System.IO;
 
 namespace GhostscriptService
 {
@@ -26,6 +27,9 @@ namespace GhostscriptService
                 _serviceHost.Close();
             }
 
+			//Delete previous dynamic loading DLLs if there are any.
+			InstancesManager.DeleteDynamicLoadingDLL();
+
             // Create a ServiceHost for the ConvertToPdfService type and provide the base address.
             _serviceHost = new ServiceHost(typeof(ConverterService));
 			
@@ -37,7 +41,8 @@ namespace GhostscriptService
         {
             if (_serviceHost != null)
             {
-                _serviceHost.Close();
+				_serviceHost.Close();
+				InstancesManager.DeleteDynamicLoadingDLL();
                 _serviceHost = null;
             }
         }
