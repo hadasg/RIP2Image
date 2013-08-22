@@ -1,23 +1,19 @@
 ﻿/*******************************************************************************
-Description:
-	Ghostscript Service contract implementation.
+	RIP2Image is a program that efficiently converts formats such as PDF or Postscript to image formats such as Jpeg or PNG.
+    Copyright (C) 2013 XMPie Ltd.
 
-COPYRIGHT (C) 2013 Hadas Groisman & Amit Cohen.
-  
- 	This file is part of GhostscriptService.
-
-    GhostscriptService is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GhostscriptService is distributed in the hope that it will be useful,
+    This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+    GNU General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with GhostscriptService.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 using System;
@@ -26,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.IO;	
 
-namespace GhostscriptService
+namespace RIP2Jmage
 {
 	/// <summary>
 	/// Uniting all convert utilities.
@@ -51,21 +47,26 @@ namespace GhostscriptService
 		{
 			bool conversionSucceed;
 
-			conversionSucceed = CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-
-			if (conversionSucceed)
+			try
 			{
-				string OutputFileFullPath = PreFileConvert(inConvertFilePath, inNewFileTargetPath);
-				inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
-
-				// Make the conversion.
-				FileConverter fileConvertor = InstancesManager.GetObject();
-				conversionSucceed = fileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-				InstancesManager.PutObject(fileConvertor);
-
-				// Rename JPG names to the correct page counter.
-				RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
+				CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			}
+			catch (System.Exception ex)
+			{
+				throw ex;
+			}
+
+			string OutputFileFullPath = PreFileConvert(inConvertFilePath, inNewFileTargetPath);
+			inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject();
+			conversionSucceed = fileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(fileConvertor);
+
+			// Rename JPG names to the correct page counter.
+			RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
+			
 
 			return conversionSucceed;
 		}
@@ -89,20 +90,23 @@ namespace GhostscriptService
 		{
 			bool conversionSucceed;
 
-			conversionSucceed = CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-
-			if (conversionSucceed)
+			try
 			{
-				inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
-				inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
-				System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
-				//System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
-
-				// Convert all files in folder.
-				FileConverter fileConvertor = InstancesManager.GetObject();
-				conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-				InstancesManager.PutObject(fileConvertor);
+				CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			}
+			catch (System.Exception ex)
+			{
+				throw ex;
+			}
+			
+			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
+			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+
+			// Convert all files in folder.
+			FileConverter fileConvertor = InstancesManager.GetObject();
+			conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(fileConvertor);
 			
 			return conversionSucceed;
 		}
@@ -161,31 +165,24 @@ namespace GhostscriptService
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <param name="inQuality"></param>
 		/// <returns></returns>
-		private bool CheckParamValidation(double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		private void CheckParamValidation(double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			if (inResolutionX <= 0 || inResolutionY <= 0)
 			{
-				throw new System.ArgumentException("Resolution cannot be <= 0", "original");
-				//throw new Exception("Resolution has to be > 0");
-				return false;
+				throw new ArgumentException("Resolution cannot be <= 0");
 			}
 			else if (!(inGraphicsAlphaBitsValue == 1 || inGraphicsAlphaBitsValue == 2 || inGraphicsAlphaBitsValue == 4))
 			{
-				throw new Exception("GraphicsAlphaBits values are 1, 2 or 4");
-				return false;
+				throw new ArgumentException("GraphicsAlphaBits values are 1, 2 or 4");
 			}
 			else if (!(inTextAlphaBitsValue == 1 || inTextAlphaBitsValue == 2 || inTextAlphaBitsValue == 4))
 			{
-				throw new Exception("TextAlphaBits values are 1, 2 or 4");
-				return false;
+				throw new ArgumentException("TextAlphaBits values are 1, 2 or 4");
 			}
 			else if (inQuality < 0 || inQuality > 100)
 			{
-				throw new Exception("File quality range is 0-100");
-				return false;
+				throw new ArgumentException("File quality range is 0-100");
 			}
-
-			return true;
 		}
 
 		/// <summary>

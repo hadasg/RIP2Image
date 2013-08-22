@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostscriptService", "GhostscriptService.csproj", "{7BD6AA82-E151-47CF-A813-9EE636700CDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIP2Image", "RIP2Image.csproj", "{7BD6AA82-E151-47CF-A813-9EE636700CDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

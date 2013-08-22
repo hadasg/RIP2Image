@@ -1,23 +1,19 @@
 ﻿/*******************************************************************************
-Description:
-	Ghostscript Service contract.
+	RIP2Image is a program that efficiently converts formats such as PDF or Postscript to image formats such as Jpeg or PNG.
+    Copyright (C) 2013 XMPie Ltd.
 
-COPYRIGHT (C) 2013 Hadas Groisman & Amit Cohen.
-  
- 	This file is part of GhostscriptService.
-
-    GhostscriptService is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GhostscriptService is distributed in the hope that it will be useful,
+    This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+    GNU General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with GhostscriptService.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 
 using System;
@@ -26,9 +22,9 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 
-namespace GhostscriptService
+namespace RIP2Jmage
 {
-	[ServiceContract(Namespace = "GhostscriptService")]
+	[ServiceContract(Namespace = "RIP2Jmage")]
     public interface IConverterService
 		{ 
 
@@ -39,7 +35,7 @@ namespace GhostscriptService
 		/// <param name="inTargetFilePath"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		[OperationContract(Action = "GhostscriptService/ConvertPDF2JPG")]
+		[OperationContract(Action = "RIP2Jmage/ConvertPDF2JPG")]
 		bool ConvertPDF2JPG(string inConvertFilePath, string inTargetFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality);
 
 		/// <summary>
@@ -52,7 +48,7 @@ namespace GhostscriptService
 		/// <param name="inSearchSubFoldersstring"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		[OperationContract(Action = "GhostscriptService/ConvertPDFFolder2JPG")]
+		[OperationContract(Action = "RIP2Jmage/ConvertPDFFolder2JPG")]
 		bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFoldersstring, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality);
     }
 }

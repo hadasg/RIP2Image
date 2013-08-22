@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Ghostscript Service")]
-[assembly: AssemblyDescription("Ghostscript Service")]
+[assembly: AssemblyTitle("RIP2Jmage")]
+[assembly: AssemblyDescription("RIP2Jmage")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hadas Ltd.")]
-[assembly: AssemblyProduct("Ghostscript Service")]
-[assembly: AssemblyCopyright("Copyright © 2013")]
+[assembly: AssemblyCompany("XMPie Ltd.")]
+[assembly: AssemblyProduct("RIP2Jmage")]
+[assembly: AssemblyCopyright("Copyright (C) 2013")]
 [assembly: AssemblyTrademark("Hadas")]
 [assembly: AssemblyCulture("")]
 

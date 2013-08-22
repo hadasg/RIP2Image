@@ -8,8 +8,8 @@
     <ProjectGuid>{7BD6AA82-E151-47CF-A813-9EE636700CDF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GhostscriptService</RootNamespace>
-    <AssemblyName>GhostscriptService</AssemblyName>
+    <RootNamespace>RIP2Jmage</RootNamespace>
+    <AssemblyName>RIP2Image</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>GhostscriptService.Program</StartupObject>
+    <StartupObject>RIP2Jmage.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

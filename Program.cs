@@ -6,7 +6,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading;
 
-namespace GhostscriptService
+namespace RIP2Jmage
 {
 	static class Program
 	{
@@ -48,7 +48,7 @@ namespace GhostscriptService
 
 			Worker workerObject = new Worker();
 			Thread workerThread = new Thread(workerObject.DoWork1);
-			workerThread.Start();
+			//workerThread.Start();
 
 			Worker workerObject2 = new Worker();
 			Thread workerThread2 = new Thread(workerObject.DoWork2);
@@ -81,7 +81,7 @@ namespace GhostscriptService
 				
 				for (int i = 3; i < 101; i++)
 				{
-				convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy "+ i +".pdf", "C:\\gs\\JPG\\Folder1",72, 72, 4, 4, 85);
+				convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy "+ i +".pdf", "C:\\gs\\JPG\\Folder1", 72, 72, 4, 4, 85);
 				}
 				
 				sw.Stop();
@@ -94,7 +94,7 @@ namespace GhostscriptService
 				sw.Start();
 
 				ConverterService convert = new ConverterService();
-				convert.ConvertPDFFolder2JPG("C:\\gs\\PDF", "C:\\gs\\PDF", "*.pdf", false, true, 100, 100, 1, 4, 85);
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)
  				{
@@ -104,6 +104,8 @@ namespace GhostscriptService
 				sw.Stop();
 				Console.WriteLine("Elapsed Thread 2={0}", sw.ElapsedMilliseconds / 1000);
 			}
+
+
 		}
 
 
