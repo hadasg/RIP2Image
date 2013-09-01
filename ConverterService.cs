@@ -124,16 +124,12 @@ namespace RIP2Jmage
 		private string PreFileConvert(string inConvertFilePath, string inNewFileTargetPath)
 		{
 			// Generate new file type name.
-			string fileName = GetFileName(inConvertFilePath);
-			fileName += "-%d.jpg";
+			string fileName = GetFileName(inConvertFilePath) + "-%d.jpg";
 
 			// Concatenate target path with file name.
-			inNewFileTargetPath += "\\";
-			string OutputFileFullPath = inNewFileTargetPath + fileName;
+			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
 
-			OutputFileFullPath = OutputFileFullPath.Replace("\\", "\\\\");
-
-			return OutputFileFullPath;
+			return OutputFileFullPath.Replace("\\", "\\\\");
 		}
 
 
@@ -152,8 +148,7 @@ namespace RIP2Jmage
 
 			int fileNameLength = fileNameLastIndex - lastDoubleSlashIndex;
 
-			string fileName = inConvertFilePath.Substring(lastDoubleSlashIndex + 1, fileNameLength);
-			return fileName;
+			return inConvertFilePath.Substring(lastDoubleSlashIndex + 1, fileNameLength);
 		}
 
 		/// <summary>
