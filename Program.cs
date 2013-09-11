@@ -57,8 +57,8 @@ namespace RIP2Jmage
            
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            string convertFolderPath = "C:\\gs\\PDF";
-            string targetFolderPath = "C:\\gs\\JPG";
+            //string convertFolderPath = "C:\\gs\\PDF";
+            //string targetFolderPath = "C:\\gs\\JPG";
 
 			/*
 			FileConvertor fileConverter = new FileConvertor();
@@ -115,6 +115,7 @@ namespace RIP2Jmage
 
 				ConverterService convert = new ConverterService();
 				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
+				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)
  				{

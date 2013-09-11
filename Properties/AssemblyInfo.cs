@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("XMPie Ltd.")]
 [assembly: AssemblyProduct("RIP2Jmage")]
 [assembly: AssemblyCopyright("Copyright (C) 2013")]
-[assembly: AssemblyTrademark("Hadas")]
+[assembly: AssemblyTrademark("RIP2Jmage")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
