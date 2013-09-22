@@ -280,12 +280,25 @@ namespace RIP2Jmage
 			{
 				if (fileName.Contains(".jpg"))
 				{
-					string fileNewName = inFileDir + "\\" + GetFileName(inFileFullName) + "-" + filesCounter + ".jpg";
+					string pageNumberOutputFormat = GeneratePageNumberOutputFormat(filesCounter);
+					string fileNewName = inFileDir + "\\" + GetFileName(inFileFullName) + pageNumberOutputFormat + filesCounter + ".jpg";
 					// Rename file.
 					File.Move(fileName, fileNewName);
 					filesCounter++;
 				}
 			}
+		}
+
+		private string GeneratePageNumberOutputFormat(int inFilesCounter)
+		{
+			if (inFilesCounter >= 1 && inFilesCounter <= 9)
+				return "_p00";
+			else if (inFilesCounter >= 10 && inFilesCounter <= 99)
+				return "_p0";
+			else if (inFilesCounter >= 100 && inFilesCounter <= 999)
+				return "_p";
+
+			return null;
 		}
 
 	#endregion
