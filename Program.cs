@@ -50,10 +50,11 @@ namespace RIP2Jmage
 	{
 		static void Main()
         {
-           //ConvertPDF2JPG("C:\\gs\\PDF\\Folder2\\2Text_graph_image_cmyk_rgb.pdf", "C:\\gs\\PDF\\Folder1");
-          //ConvertPDF2JPG("C:\\gs\\PDF\\Folder1\\text_graph_image_cmyk_rgb.pdf", "C:\\gs\\JPG");
+			
+			//ConverterService convert = new ConverterService();
+			//convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF2\\ξκηςσδξκφ.pdf", "C:\\gs\\XLIMTest\\JPG\\hadas.jpg", 72, 72, 4, 4, 85);
 
-          //mulipuleFileNomTimes(10000, "1Record", "C:\\gs\\PS\\1Record.ps", "C:\\gs\\PS");
+			//mulipuleFileNomTimes(10000, "1Record", "C:\\gs\\PS\\1Record.ps", "C:\\gs\\PS");
            
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -64,15 +65,22 @@ namespace RIP2Jmage
 			FileConvertor fileConverter = new FileConvertor();
 			*/
 
-			ConverterService convert = new ConverterService();
 
 			Worker workerObject = new Worker();
 			Thread workerThread = new Thread(workerObject.DoWork1);
-			//workerThread.Start();
+			workerThread.Start();
 
 			Worker workerObject2 = new Worker();
 			Thread workerThread2 = new Thread(workerObject.DoWork2);
 			workerThread2.Start();
+
+			Worker workerObject3 = new Worker();
+			Thread workerThread3 = new Thread(workerObject.DoWork3);
+			workerThread3.Start();
+
+			Worker workerObject4 = new Worker();
+			Thread workerThread4 = new Thread(workerObject.DoWork4);
+			workerThread4.Start();
 			
 			//convert.ConvertFileType("C:\\gs\\PDF\\Folder2\\2Text_graph_image_cmyk_rgb.pdf", "C:\\gs\\JPG\\Folder2", wild.Length, "jpg");
 		
@@ -98,12 +106,14 @@ namespace RIP2Jmage
 				sw.Start();
 
 				ConverterService convert = new ConverterService();
-				
-				for (int i = 3; i < 101; i++)
-				{
-				convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy "+ i +".pdf", "C:\\gs\\JPG\\Folder1", 72, 72, 4, 4, 85);
-				}
-				
+
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-1", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-1", "*.pdf", true, true, 72, 72, 4, 4, 85);
+
+				// 				for (int i = 3; i < 101; i++)
+				// 				{
+				// 				convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy "+ i +".pdf", "C:\\gs\\JPG\\Folder1", 72, 72, 4, 4, 85);
+				// 				}
+				// 				
 				sw.Stop();
 				Console.WriteLine("Elapsed Thread 1={0}", sw.ElapsedMilliseconds / 1000);
 			}
@@ -114,7 +124,8 @@ namespace RIP2Jmage
 				sw.Start();
 
 				ConverterService convert = new ConverterService();
-				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
+
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-2", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-2", "*.pdf", true, true, 72, 72, 4, 4, 85);
 				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)
@@ -126,6 +137,43 @@ namespace RIP2Jmage
 				Console.WriteLine("Elapsed Thread 2={0}", sw.ElapsedMilliseconds / 1000);
 			}
 
+			public void DoWork3()
+			{
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+
+				ConverterService convert = new ConverterService();
+
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-3", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-3", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
+				/*
+				for (int i = 3; i < 101; i++)
+ 				{
+					convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy " + i + ".pdf", "C:\\gs\\JPG\\Folder2", 1, 1, 85, 72, 72);
+ 				}
+				*/
+				sw.Stop();
+				Console.WriteLine("Elapsed Thread 2={0}", sw.ElapsedMilliseconds / 1000);
+			}
+
+			public void DoWork4()
+			{
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+
+				ConverterService convert = new ConverterService();
+
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-4", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-4", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
+				/*
+				for (int i = 3; i < 101; i++)
+ 				{
+					convert.ConvertPDF2JPG("C:\\gs\\PDFThread\\Folder1\\text_graphic_image - Copy - Copy " + i + ".pdf", "C:\\gs\\JPG\\Folder2", 1, 1, 85, 72, 72);
+ 				}
+				*/
+				sw.Stop();
+				Console.WriteLine("Elapsed Thread 2={0}", sw.ElapsedMilliseconds / 1000);
+			}
 
 		}
 
@@ -163,12 +211,12 @@ namespace RIP2Jmage
 			fileName += "-%d." + newFileType;
 			
 			targetFilePath += "\\";
-			string OutputFileFullPath = targetFilePath + fileName;
+			string outputFileFullPath = targetFilePath + fileName;
 			
-			OutputFileFullPath = OutputFileFullPath.Replace("\\", "\\\\");
+			outputFileFullPath = outputFileFullPath.Replace("\\", "\\\\");
 
 			convertFilePath = convertFilePath.Replace("\\", "\\\\");
-			fileConverter.Convert(convertFilePath, OutputFileFullPath);
+			fileConverter.Convert(convertFilePath, outputFileFullPath);
         }
 
 		/// <summary>

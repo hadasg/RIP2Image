@@ -22,7 +22,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;	
+using System.IO;
+using System.Web;
+using System.Threading;
 
 namespace RIP2Jmage
 {
@@ -39,7 +41,7 @@ namespace RIP2Jmage
 		}
 
 
-	#region Methods
+		#region Methods
 		/// <summary>
 		/// Convert PDF to JPG.
 		/// </summary>
@@ -49,26 +51,24 @@ namespace RIP2Jmage
 		{
 			bool conversionSucceed;
 
-			try
-			{
-				CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			}
-			catch (System.Exception ex)
-			{
-				throw ex;
-			}
+			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			//TODO: add logs
 
-			string OutputFileFullPath = PreFileConvert(inConvertFilePath, inNewFileTargetPath);
-			inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
+			// Handles Unicode filename.
+			string encodedConvertFilePath = UnicodeFilenameHandle(inConvertFilePath);
+
+			// Paths preparation for file conversion.
+			string outputFileFullPath = PreFileConvert(inNewFileTargetPath);
+			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
 
 			// Make the conversion.
 			FileConverter fileConvertor = InstancesManager.GetObject();
-			conversionSucceed = fileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			conversionSucceed = fileConvertor.Convert(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			InstancesManager.PutObject(fileConvertor);
 
 			// Rename JPG names to the correct page counter.
 			RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
-			
+
 
 			return conversionSucceed;
 		}
@@ -92,15 +92,9 @@ namespace RIP2Jmage
 		{
 			bool conversionSucceed;
 
-			try
-			{
-				CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			}
-			catch (System.Exception ex)
-			{
-				throw ex;
-			}
-			
+			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			//TODO: add logs
+
 			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
 			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
@@ -109,48 +103,28 @@ namespace RIP2Jmage
 			FileConverter fileConvertor = InstancesManager.GetObject();
 			conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			InstancesManager.PutObject(fileConvertor);
-			
+
 			return conversionSucceed;
 		}
 
-	#endregion
+		#endregion
 
-	#region Help Method
+		#region Help Method
 
 		/// <summary>
 		/// Parameters preparation before conversion.
 		/// </summary>
-		/// <param name="inConvertFilePath"></param>
 		/// <param name="inNewFileTargetPath"></param>
 		/// <returns></returns>
-		private string PreFileConvert(string inConvertFilePath, string inNewFileTargetPath)
+		private string PreFileConvert(string inNewFileTargetPath)
 		{
-			// Generate new file type name.
-			string fileName = GetFileName(inConvertFilePath) + "-%d.jpg";
+			//We give temporary name for the JPG files we will generate so we can handle Unicode filename.
+			string fileName = "tmp-%d.jpg";
 
 			// Concatenate target path with file name.
 			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
 
 			return OutputFileFullPath.Replace("\\", "\\\\");
-		}
-
-
-		/// <summary>
-		/// Extracting file name from inConvertFilePath.
-		/// </summary>
-		/// <param name="inConvertFilePath"></param>
-		/// <returns></returns>
-		private string GetFileName(string inConvertFilePath)
-		{
-			int lastDoubleSlashIndex = inConvertFilePath.LastIndexOf("\\");
-
-			int inWildCardLength = inConvertFilePath.Length - inConvertFilePath.LastIndexOf(".");
-
-			int fileNameLastIndex = inConvertFilePath.Length - inWildCardLength - 1;
-
-			int fileNameLength = fileNameLastIndex - lastDoubleSlashIndex;
-
-			return inConvertFilePath.Substring(lastDoubleSlashIndex + 1, fileNameLength);
 		}
 
 		/// <summary>
@@ -204,32 +178,31 @@ namespace RIP2Jmage
 			System.IO.DirectoryInfo[] subDirs = null;
 
 			// First, process all the files directly under this folder
-			try
-			{
-				files = inRoot.GetFiles(inConvertFileWildCard);
-			}
-			catch (System.IO.DirectoryNotFoundException e)
-			{
-				Console.WriteLine(e.Message);
-			}
+			files = inRoot.GetFiles(inConvertFileWildCard);
+			//TODO: add logs
 
 			if (files != null)
 			{
 				foreach (System.IO.FileInfo file in files)
 				{
+					// Handles Unicode filename.
+					string encodedConvertFilePath = UnicodeFilenameHandle(file.FullName);
+
+					// Paths preparation for file conversion.
+					string outputFileFullPath = PreFileConvert(inTargetFolderPath);
+					encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
+
 					// Make file conversion.
-					string inConvertFilePath = file.FullName;
-					string OutputFileFullPath = PreFileConvert(inConvertFilePath, inTargetFolderPath);
-					inConvertFilePath = inConvertFilePath.Replace("\\", "\\\\");
-					fileConversion = inFileConvertor.Convert(inConvertFilePath, OutputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-					if(!fileConversion)
+					fileConversion = inFileConvertor.Convert(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+					if (!fileConversion)
 						return false;
 
 					//Delete old files.
 					if (inDeleteSourcePDF)
-					{
-						file.Delete();
-					}
+						FileDelete(encodedConvertFilePath);
+					else
+						FileMove(encodedConvertFilePath, file.FullName);  // Decode URL.
+
 
 					// Rename JPG names to the correct page counter.
 					RenameJPGNames(inTargetFolderPath, file.FullName);
@@ -265,30 +238,47 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-		/// Rename JPG names to the correct page counter.
+		/// Handles Unicode filename.
+		/// </summary>
+		/// <param name="inFilePath"></param>
+		/// <returns></returns>
+		private string UnicodeFilenameHandle(string inFilePath)
+		{
+			string fileName = Path.GetFileNameWithoutExtension(inFilePath);
+			string encodedFileName = HttpUtility.UrlEncode(fileName);
+			string encodedConvertFilePath = inFilePath.Replace(fileName, encodedFileName);
+			FileMove(inFilePath, encodedConvertFilePath);
+			return encodedConvertFilePath;
+		}
+
+		/// <summary>
+		/// Rename JPG names to the correct name and page counter.
 		/// </summary>
 		/// <param name="inFileDir">Target folder path</param>
 		/// <param name="inFileFullName">File full path name</param>
 		private void RenameJPGNames(string inFileDir, string inFileFullName)
 		{
-			string fileNameWithoutCounter = GetFileName(inFileFullName) + "*";
-			
-			string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, fileNameWithoutCounter);
+			string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, "tmp*");
 
 			int filesCounter = 1;
 			foreach (string fileName in filesNameWithTheSamePrefix)
 			{
-				if (fileName.Contains(".jpg"))
+				if (fileName.EndsWith(".jpg"))
 				{
 					string pageNumberOutputFormat = GeneratePageNumberOutputFormat(filesCounter);
-					string fileNewName = inFileDir + "\\" + GetFileName(inFileFullName) + pageNumberOutputFormat + filesCounter + ".jpg";
+					string fileNewName = inFileDir + "\\" + Path.GetFileNameWithoutExtension(inFileFullName) + pageNumberOutputFormat + filesCounter + ".jpg";
 					// Rename file.
-					File.Move(fileName, fileNewName);
+					FileMove(fileName, fileNewName);
 					filesCounter++;
 				}
 			}
 		}
 
+		/// <summary>
+		/// Generate page number prefix format. 
+		/// </summary>
+		/// <param name="inFilesCounter"></param>
+		/// <returns></returns>
 		private string GeneratePageNumberOutputFormat(int inFilesCounter)
 		{
 			if (inFilesCounter >= 1 && inFilesCounter <= 9)
@@ -301,7 +291,53 @@ namespace RIP2Jmage
 			return null;
 		}
 
-	#endregion
+		/// <summary>
+		/// Tries to move (or rename) file several times in order to avoid unavailable/locked files issues
+		/// </summary>		
+		private void FileMove(string sourceFileName, string destFileName)
+		{
+			// try to move file
+			int i = 0;
+			while (true)
+			{
+				try
+				{
+					File.Move(sourceFileName, destFileName);
+					break;
+				}
+				catch (Exception ex)
+				{
+					if (i < 3)
+						Thread.Sleep(++i * 100);
+					else
+						throw ex;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to delete the file several times in order to avoid unavailable/locked files issues
+		/// </summary>		
+		private void FileDelete(string filePath)
+		{
+			int i = 0;
+			while (true)
+			{
+				try
+				{
+					File.Delete(filePath);
+					break;
+				}
+				catch (Exception ex)
+				{
+					if (i < 3)
+						Thread.Sleep(++i * 100);
+					else
+						throw ex;
+				}
+			}
+		}
+		#endregion
 
 	}
 }
