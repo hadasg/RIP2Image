@@ -51,8 +51,8 @@ namespace RIP2Jmage
 		static void Main()
         {
 			
-			//ConverterService convert = new ConverterService();
-			//convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF2\\ξκηςσδξκφ.pdf", "C:\\gs\\XLIMTest\\JPG\\hadas.jpg", 72, 72, 4, 4, 85);
+			ConverterService convert = new ConverterService();
+			convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF Process\\nieuwsbrief 2012.xlim.pdf", "C:\\gs\\XLIMTest\\PDF Process", 72, 72, 2, 4, 100);
 
 			//mulipuleFileNomTimes(10000, "1Record", "C:\\gs\\PS\\1Record.ps", "C:\\gs\\PS");
            
@@ -68,19 +68,19 @@ namespace RIP2Jmage
 
 			Worker workerObject = new Worker();
 			Thread workerThread = new Thread(workerObject.DoWork1);
-			workerThread.Start();
+			//workerThread.Start();
 
 			Worker workerObject2 = new Worker();
 			Thread workerThread2 = new Thread(workerObject.DoWork2);
-			workerThread2.Start();
+			//workerThread2.Start();
 
 			Worker workerObject3 = new Worker();
 			Thread workerThread3 = new Thread(workerObject.DoWork3);
-			workerThread3.Start();
+			//workerThread3.Start();
 
 			Worker workerObject4 = new Worker();
 			Thread workerThread4 = new Thread(workerObject.DoWork4);
-			workerThread4.Start();
+			//workerThread4.Start();
 			
 			//convert.ConvertFileType("C:\\gs\\PDF\\Folder2\\2Text_graph_image_cmyk_rgb.pdf", "C:\\gs\\JPG\\Folder2", wild.Length, "jpg");
 		
@@ -91,7 +91,7 @@ namespace RIP2Jmage
             Console.WriteLine("Elapsed={0}", sw.ElapsedMilliseconds/1000);
 
 			//workerThread.Join();
-			workerThread2.Join();
+			//workerThread2.Join();
 			InstancesManager.DeleteDynamicLoadingDLL();
 
 
@@ -107,7 +107,7 @@ namespace RIP2Jmage
 
 				ConverterService convert = new ConverterService();
 
-				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-1", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-1", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-1", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-1", "*.pdf", true, true, 72, 72, 2, 4, 100);
 
 				// 				for (int i = 3; i < 101; i++)
 				// 				{
@@ -125,7 +125,7 @@ namespace RIP2Jmage
 
 				ConverterService convert = new ConverterService();
 
-				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-2", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-2", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-2", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-2", "*.pdf", true, true, 72, 72, 2, 4, 100);
 				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)
@@ -144,7 +144,7 @@ namespace RIP2Jmage
 
 				ConverterService convert = new ConverterService();
 
-				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-3", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-3", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-3", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-3", "*.pdf", true, true, 72, 72, 2, 4, 100);
 				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)
@@ -163,7 +163,7 @@ namespace RIP2Jmage
 
 				ConverterService convert = new ConverterService();
 
-				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-4", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-4", "*.pdf", true, true, 72, 72, 4, 4, 85);
+				convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\1000RPDF\\1000R-4", "C:\\gs\\XLIMTest\\1000RJPG\\1000R-4", "*.pdf", true, true, 72, 72, 2, 4, 100);
 				//convert.ConvertPDFFolder2JPG("C:\\gs\\XLIMTest\\PDF", "C:\\gs\\XLIMTest\\JPG", "*.pdf", false, true, 72, 72, 4, 4, 85);
 				/*
 				for (int i = 3; i < 101; i++)

@@ -62,6 +62,7 @@ namespace RIP2Jmage
 			parameters[0] = "this is gs command .exe name";		// Ghostscript exe command.
 			parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page
 			parameters[2] = "-sDEVICE=jpeg";					// what kind of export format i should provide. For PNG use "png16m"
+			parameters[3] = "-dDOINTERPOLATE";
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);

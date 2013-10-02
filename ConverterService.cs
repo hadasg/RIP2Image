@@ -66,6 +66,8 @@ namespace RIP2Jmage
 			conversionSucceed = fileConvertor.Convert(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			InstancesManager.PutObject(fileConvertor);
 
+			FileMove(encodedConvertFilePath, inConvertFilePath);
+
 			// Rename JPG names to the correct page counter.
 			RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
 
