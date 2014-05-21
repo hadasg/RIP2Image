@@ -41,7 +41,7 @@ namespace RIP2Jmage
 		}
 
 
-		#region Methods
+	#region Methods
 		/// <summary>
 		/// Convert PDF to JPG.
 		/// </summary>
@@ -55,16 +55,16 @@ namespace RIP2Jmage
 			//TODO: add logs
 
 			// Handles Unicode filename.
-			string encodedConvertFilePath = UnicodeFilenameHandle(inConvertFilePath);
+			string encodedConvertFilePath = UnicodeFileNameHandle(inConvertFilePath);
 
 			// Paths preparation for file conversion.
-			string outputFileFullPath = PreFileConvert(inNewFileTargetPath);
+			string outputFileFullPath = PrePDF2JPGConvert(inNewFileTargetPath);
 			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
 
 			// Make the conversion.
-			FileConverter fileConvertor = InstancesManager.GetObject();
-			conversionSucceed = fileConvertor.Convert(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			InstancesManager.PutObject(fileConvertor);
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2JPG);
+			conversionSucceed = fileConvertor.ConvertPDF2JPG(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
 
 			FileMove(encodedConvertFilePath, inConvertFilePath);
 
@@ -102,26 +102,103 @@ namespace RIP2Jmage
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
 			// Convert all files in folder.
-			FileConverter fileConvertor = InstancesManager.GetObject();
-			conversionSucceed = WalkDirectoryTree(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			InstancesManager.PutObject(fileConvertor);
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2JPG);
+			conversionSucceed = WalkDirectoryTreePDF2JPG(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
 
 			return conversionSucceed;
 		}
 
-		#endregion
+		/// <summary>
+		/// Convert PDF to EPS.
+		/// </summary>
+		/// <param name="inConvertFilePath"></param>
+		/// <param name="inNewFileTargetPath"></param>
+		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
+		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
+		/// <returns></returns>
+		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, int inFirstPageToConvert, int inLastPageToConvert)
+		{
+			bool conversionSucceed;
 
-		#region Help Method
+			// Handles Unicode filename.
+			string encodedConvertFilePath = UnicodeFileNameHandle(inConvertFilePath);
+
+			// Paths preparation for file conversion.
+			string outputFileFullPath = PrePDF2EPSConvert(inNewFileTargetPath);
+			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
+			conversionSucceed = fileConvertor.ConvertPDF2EPS(encodedConvertFilePath, outputFileFullPath, inFirstPageToConvert, inLastPageToConvert);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2EPS, fileConvertor);
+
+			FileMove(encodedConvertFilePath, inConvertFilePath);
+
+			// Rename EPS file to the PDF name.
+			string fileNewName = inNewFileTargetPath + "\\" + Path.GetFileNameWithoutExtension(inConvertFilePath) + ".eps";
+			FileMove(outputFileFullPath, fileNewName);
+
+			return conversionSucceed;
+		}
+
+		/// <summary>
+		/// Convert all files type under inConvertFolderPath to EPS.
+		/// </summary>
+		/// <param name="inConvertFolderPath"></param>
+		/// <param name="inTargetFolderPath"></param>
+		/// <param name="inConvertFileWildCard"></param>
+		/// <param name="inDeleteSourcePDF"></param>
+		/// <param name="inSearchSubFolders"></param>
+		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
+		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
+		/// <returns></returns>
+		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, int inFirstPageToConvert, int inLastPageToConvert)
+		{
+			bool conversionSucceed;
+
+			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
+			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+
+			// Convert all files in folder.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
+			conversionSucceed = WalkDirectoryTreePDF2EPS(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, 
+														inConvertFolderPath.Equals(inTargetFolderPath), inFirstPageToConvert, inLastPageToConvert);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
+
+			return conversionSucceed;
+		}
+
+	#endregion
+
+	#region Help Method
 
 		/// <summary>
 		/// Parameters preparation before conversion.
 		/// </summary>
 		/// <param name="inNewFileTargetPath"></param>
 		/// <returns></returns>
-		private string PreFileConvert(string inNewFileTargetPath)
+		private string PrePDF2JPGConvert(string inNewFileTargetPath)
 		{
-			//We give temporary name for the JPG files we will generate so we can handle Unicode filename.
+			//We give temporary name to the JPG files we will generate so we can handle Unicode file name.
 			string fileName = "tmp-%d.jpg";
+
+			// Concatenate target path with file name.
+			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
+
+			return OutputFileFullPath.Replace("\\", "\\\\");
+		}
+
+		/// <summary>
+		/// Parameters preparation before conversion.
+		/// </summary>
+		/// <param name="inNewFileTargetPath"></param>
+		/// <returns></returns>
+		private string PrePDF2EPSConvert(string inNewFileTargetPath)
+		{
+			//We give temporary name to the EPS file we will generate so we can handle Unicode file name.
+			string fileName = "convertedEPS.eps";
 
 			// Concatenate target path with file name.
 			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
@@ -159,9 +236,9 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-		/// Walking traverse all folders under inRoot looking for appropriate files which their type need to convert to inNewFileType. 
+		/// Walking traverse all folders under inRoot looking for PDF files need to convert to JPG.
 		/// While find one convert it and put it under the same folder if inSameTrgetFolder==true, otherwise creating a folder under inTargetFolderPath with the
-		/// same name as the original file located on.
+		/// same name as the original file (to convert) located on.
 		/// </summary>
 		/// <param name="inFileConvertor"></param>
 		/// <param name="inRoot"></param>
@@ -172,7 +249,9 @@ namespace RIP2Jmage
 		/// <param name="inSameTrgetFolder"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		private bool WalkDirectoryTree(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		private bool WalkDirectoryTreePDF2JPG(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, 
+												bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, double inResolutionX, double inResolutionY, 
+												double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			bool fileConversion;
 
@@ -188,14 +267,14 @@ namespace RIP2Jmage
 				foreach (System.IO.FileInfo file in files)
 				{
 					// Handles Unicode filename.
-					string encodedConvertFilePath = UnicodeFilenameHandle(file.FullName);
+					string encodedConvertFilePath = UnicodeFileNameHandle(file.FullName);
 
 					// Paths preparation for file conversion.
-					string outputFileFullPath = PreFileConvert(inTargetFolderPath);
+					string outputFileFullPath = PrePDF2JPGConvert(inTargetFolderPath);
 					encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
 
 					// Make file conversion.
-					fileConversion = inFileConvertor.Convert(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+					fileConversion = inFileConvertor.ConvertPDF2JPG(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 					if (!fileConversion)
 						return false;
 
@@ -223,12 +302,96 @@ namespace RIP2Jmage
 							//Create the sub folder
 							System.IO.Directory.CreateDirectory(newPath);
 							//Recursive call for each subdirectory.
-							WalkDirectoryTree(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+							WalkDirectoryTreePDF2JPG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 						}
 						else
 						{
 							// Recursive call for each subdirectory.
-							WalkDirectoryTree(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+							WalkDirectoryTreePDF2JPG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+						}
+
+					}
+				}
+
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Walking traverse all folders under inRoot looking for PDF files need to convert to EPS. 
+		/// While find one convert it and put it under the same folder if inSameTrgetFolder==true, otherwise creating a folder under inTargetFolderPath with the
+		/// same name as the original file located on.
+		/// </summary>
+		/// <param name="inFileConvertor"></param>
+		/// <param name="inRoot"></param>
+		/// <param name="inTargetFolderPath"></param>
+		/// <param name="inConvertFileWildCard"></param>
+		/// <param name="inDeleteSourcePDF"></param>
+		/// <param name="inSearchSubFolders"></param>
+		/// <param name="inSameTrgetFolder"></param>
+		/// <param name="inFirstPageToConvert"></param>
+		/// <param name="inLastPageToConvert"></param>
+		/// <returns></returns>
+		private bool WalkDirectoryTreePDF2EPS(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, 
+												bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, int inFirstPageToConvert, int inLastPageToConvert)
+		{
+			bool fileConversion;
+
+			System.IO.FileInfo[] files = null;
+			System.IO.DirectoryInfo[] subDirs = null;
+
+			// First, process all the files directly under this folder
+			files = inRoot.GetFiles(inConvertFileWildCard);
+			//TODO: add logs
+
+			if (files != null)
+			{
+				foreach (System.IO.FileInfo file in files)
+				{
+					// Handles Unicode filename.
+					string encodedConvertFilePath = UnicodeFileNameHandle(file.FullName);
+
+					// Paths preparation for file conversion.
+					string outputFileFullPath = PrePDF2EPSConvert(inTargetFolderPath);
+					encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
+
+					// Make file conversion.
+					fileConversion = inFileConvertor.ConvertPDF2EPS(encodedConvertFilePath, outputFileFullPath, inFirstPageToConvert, inLastPageToConvert);
+					if (!fileConversion)
+						return false;
+
+					//Delete old files.
+					if (inDeleteSourcePDF)
+						FileDelete(encodedConvertFilePath);
+					else
+						FileMove(encodedConvertFilePath, file.FullName);  // Decode URL.
+
+					// Rename EPS file to the PDF name.
+					string fileNewName = inTargetFolderPath + "\\" + Path.GetFileNameWithoutExtension(file.FullName) + ".eps";
+					//outputFileFullPath = outputFileFullPath.Replace("\\\\", "\\");
+					FileMove(outputFileFullPath, fileNewName);
+				}
+
+				if (inSearchSubFolders)
+				{
+					// Now find all the subdirectories under this directory.
+					subDirs = inRoot.GetDirectories();
+					foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+					{
+						if (!inSameTrgetFolder)
+						{
+							//Create a new sub folder under target folder path
+							string newPath = System.IO.Path.Combine(inTargetFolderPath, dirInfo.Name);
+							//Create the sub folder
+							System.IO.Directory.CreateDirectory(newPath);
+							//Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2EPS(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inFirstPageToConvert, inLastPageToConvert);
+						}
+						else
+						{
+							// Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2EPS(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTrgetFolder, inFirstPageToConvert, inLastPageToConvert);
 						}
 
 					}
@@ -244,7 +407,7 @@ namespace RIP2Jmage
 		/// </summary>
 		/// <param name="inFilePath"></param>
 		/// <returns></returns>
-		private string UnicodeFilenameHandle(string inFilePath)
+		private string UnicodeFileNameHandle(string inFilePath)
 		{
 			string fileName = Path.GetFileNameWithoutExtension(inFilePath);
 			string encodedFileName = HttpUtility.UrlEncode(fileName);
@@ -339,7 +502,7 @@ namespace RIP2Jmage
 				}
 			}
 		}
-		#endregion
+	#endregion
 
 	}
 }

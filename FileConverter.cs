@@ -43,17 +43,27 @@ namespace RIP2Jmage
 
 	#region Methods
 		/// <summary>
-		/// Constructor.
+		/// Constructor - init FileConverter by convertion type.
 		/// </summary>
-		public FileConverter()
+		public FileConverter(InstancesManager.ConversionType inConvertionType)
 		{
-			Init();		  
+			switch (inConvertionType)
+			{
+				case InstancesManager.ConversionType.PDF2JPG:
+					InitPDF2JPGConversion();
+					break;
+				case InstancesManager.ConversionType.PDF2EPS:
+					InitPDF2EPSConversion();			
+					break;
+				default:
+					break;
+			}	  
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters.
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
 		/// </summary>
-		public void Init()
+		public void InitPDF2JPGConversion()
 		{
 			Cleanup();
 
@@ -66,6 +76,17 @@ namespace RIP2Jmage
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+		}
+
+		/// <summary>
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2EPS conversion.
+		/// </summary>
+		public void InitPDF2EPSConversion()
+		{
+			// Need to implement in the future.
+			// GS has a bug that causes the created EPS file to be lock until quit command called.
+			// In addition, this bug prevents writing for more than one EPS file in a single run.
+			// Therefor, it's impossible to reuse a GS instance many time.
 		}
 
 		/// <summary>
@@ -90,14 +111,14 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-		/// Convert file type.
+		/// Convert PDF to JPG.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
 		/// <param name="inOutputFileFullPath"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		/// <returns>True if conversion succeeded</returns>
-		public bool Convert(string inPathFileToConvert, string inOutputFileFullPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		public bool ConvertPDF2JPG(string inPathFileToConvert, string inOutputFileFullPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
 
@@ -122,6 +143,35 @@ namespace RIP2Jmage
 			return m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString()); 
 		}
 
+		/// <summary>
+		/// Convert PDF to EPS.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFileFullPath"></param>
+		/// <param name="inFirstPageToConvert"></param>
+		/// <param name="inLastPageToConvert"></param>
+		/// <returns></returns>
+		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, int inFirstPageToConvert, int inLastPageToConvert)
+		{
+			// Parameters creation.
+			string[] parameters = new string[9];
+			parameters[0] = "this is gs command .exe name";				// Ghostscript exe command.
+			parameters[1] = "-dNOPAUSE";								// Do not prompt and pause for each page
+			parameters[2] = "-dBATCH";									// Terminate when accomplish.
+			parameters[3] = "-dEPSFitPage";								// Fit EPS to PDF page size.
+			parameters[4] = "-dFirstPage=" + inFirstPageToConvert;		// First page to convert in the PDF.
+			parameters[5] = "-dLastPage=" + inFirstPageToConvert;		// Last page to convert in the PDF.
+			parameters[6] = "-sDEVICE=eps2write";						// Device name.
+			parameters[7] = "-sOutputFile=" + inOutputFileFullPath;		// Where to write the output.
+			parameters[8] = inPathFileToConvert;						// File to convert.
+
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+
+			Cleanup();
+
+			return true;
+		}
 		
 
 	#endregion

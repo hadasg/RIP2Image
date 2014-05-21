@@ -33,36 +33,59 @@ namespace RIP2Jmage
 	/// </summary>
 	internal class InstancesManager
 	{
+		public enum ConversionType {PDF2JPG, PDF2EPS};
+
 		/// <summary>
 		/// private constructor
 		/// </summary>
 		private InstancesManager(){}
 
 		/// <summary>
-		/// Instances shard resource - thread safe.
+		/// Converter instances shard resource - thread safe.
 		/// </summary>
-		static private ConcurrentBag<FileConverter> m_ConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2JPGConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
 
 		/// <summary>
-		/// Returns available FileConvertor from ConcurrentBag collection if there is any.
+		/// Get converter instances by conversion type.
+		/// </summary>
+		/// <param name="inConversionType"></param>
+		/// <returns></returns>
+		static private ConcurrentBag<FileConverter> GetConverterInstancesByType(ConversionType inConversionType)
+		{
+			switch (inConversionType)
+			{
+				case ConversionType.PDF2JPG:
+					return m_PDF2JPGConverterInstances;
+				case ConversionType.PDF2EPS:
+					return m_PDF2EPSConverterInstances;
+				default:
+					return null;
+			}	  
+		}
+
+		/// <summary>
+		/// Returns available FileConvertor from ConcurrentBag collection by conversion type (if there is any).
 		/// Otherwise create one and return it.
 		/// </summary>
+		/// <param name="inConversionType"></param>
 		/// <returns></returns>
-        static public FileConverter GetObject()
+		static public FileConverter GetObject(ConversionType inConversionType)
         {
             FileConverter fileConverter;
-            if (!m_ConverterInstances.TryTake(out fileConverter))
-				fileConverter = new FileConverter();
+			if (!GetConverterInstancesByType(inConversionType).TryTake(out fileConverter))
+				fileConverter = new FileConverter(inConversionType);
 			return fileConverter;
         }
 		
 		/// <summary>
-		/// Return used FileConvertor to ConcurrentBag collection.
+		/// Return used FileConvertor to ConcurrentBag collection by conversion type.
 		/// </summary>
+		/// <param name="inConversionType"></param>
 		/// <param name="inFileConvertor"></param>
-		static public void PutObject(FileConverter inFileConvertor)
+		static public void PutObject(ConversionType inConversionType, FileConverter inFileConvertor)
         {
-            m_ConverterInstances.Add(inFileConvertor);
+			GetConverterInstancesByType(inConversionType).Add(inFileConvertor);
         }
 
 		/// <summary>
@@ -72,8 +95,9 @@ namespace RIP2Jmage
 		{
 			// Cleanup converter instances, which also delete their dll file member. 
 			FileConverter fileConverter;
-			while (m_ConverterInstances.TryTake(out fileConverter))
-				fileConverter.Cleanup();
+			foreach (ConversionType type in Enum.GetValues(typeof(ConversionType)))
+				while (GetConverterInstancesByType(type).TryTake(out fileConverter))
+					fileConverter.Cleanup();
 
 			// Delete dlls's directory
 			GhostscriptWrapper.DeleteDllDirectory();
