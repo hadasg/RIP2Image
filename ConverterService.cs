@@ -113,11 +113,11 @@ namespace RIP2Jmage
 		/// Convert PDF to EPS.
 		/// </summary>
 		/// <param name="inConvertFilePath"></param>
-		/// <param name="inNewFileTargetPath"></param>
+		/// <param name="inNewFileTargetFolderPath"></param>
 		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
 		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
 		/// <returns></returns>
-		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, int inFirstPageToConvert, int inLastPageToConvert)
+		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetFolderPath, int inFirstPageToConvert, int inLastPageToConvert)
 		{
 			bool conversionSucceed;
 
@@ -125,7 +125,7 @@ namespace RIP2Jmage
 			string encodedConvertFilePath = UnicodeFileNameHandle(inConvertFilePath);
 
 			// Paths preparation for file conversion.
-			string outputFileFullPath = PrePDF2EPSConvert(inNewFileTargetPath);
+			string outputFileFullPath = PrePDF2EPSConvert(inNewFileTargetFolderPath);
 			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
 
 			// Make the conversion.
@@ -136,7 +136,7 @@ namespace RIP2Jmage
 			FileMove(encodedConvertFilePath, inConvertFilePath);
 
 			// Rename EPS file to the PDF name.
-			string fileNewName = inNewFileTargetPath + "\\" + Path.GetFileNameWithoutExtension(inConvertFilePath) + ".eps";
+			string fileNewName = inNewFileTargetFolderPath + "\\" + Path.GetFileNameWithoutExtension(inConvertFilePath) + ".eps";
 			FileMove(outputFileFullPath, fileNewName);
 
 			return conversionSucceed;

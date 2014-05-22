@@ -69,12 +69,12 @@ namespace RIP2Jmage
 		///  Convert PDF to EPS.
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
-		/// <param name="inNewFileTargetPath">Folder path where the converted file will generate.</param>
+		/// <param name="inNewFileTargetFolderPath">Folder path where the converted file will generate.</param>
 		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
 		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Jmage/ConvertPDF2EPS")]
-		bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, int inFirstPageToConvert, int inLastPageToConvert);
+		bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetFolderPath, int inFirstPageToConvert, int inLastPageToConvert);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to EPS.
