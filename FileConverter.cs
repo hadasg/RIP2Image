@@ -118,7 +118,7 @@ namespace RIP2Jmage
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		/// <returns>True if conversion succeeded</returns>
-		public bool ConvertPDF2JPG(string inPathFileToConvert, string inOutputFileFullPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		public bool ConvertPDF2JPG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
 
@@ -135,10 +135,11 @@ namespace RIP2Jmage
 			ConvertPDF2JPGCommand.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
 
 			// Determine new file name.
-			ConvertPDF2JPGCommand.Append("<< /OutputFile (" + inOutputFileFullPath + ") >> setpagedevice ");
+			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.jpg";
+			ConvertPDF2JPGCommand.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
 
 			// Convert file type.
-			ConvertPDF2JPGCommand.Append("(" + inPathFileToConvert + ") run ");
+			ConvertPDF2JPGCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
 
 			return m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString()); 
 		}
@@ -151,19 +152,20 @@ namespace RIP2Jmage
 		/// <param name="inFirstPageToConvert"></param>
 		/// <param name="inLastPageToConvert"></param>
 		/// <returns></returns>
-		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, int inFirstPageToConvert, int inLastPageToConvert)
+		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
 			// Parameters creation.
-			string[] parameters = new string[9];
-			parameters[0] = "this is gs command .exe name";				// Ghostscript exe command.
-			parameters[1] = "-dNOPAUSE";								// Do not prompt and pause for each page
-			parameters[2] = "-dBATCH";									// Terminate when accomplish.
-			parameters[3] = "-dEPSFitPage";								// Fit EPS to PDF page size.
-			parameters[4] = "-dFirstPage=" + inFirstPageToConvert;		// First page to convert in the PDF.
-			parameters[5] = "-dLastPage=" + inFirstPageToConvert;		// Last page to convert in the PDF.
-			parameters[6] = "-sDEVICE=eps2write";						// Device name.
-			parameters[7] = "-sOutputFile=" + inOutputFileFullPath;		// Where to write the output.
-			parameters[8] = inPathFileToConvert;						// File to convert.
+			string[] parameters = new string[10];
+			parameters[0] = "this is gs command .exe name";								// Ghostscript exe command.
+			parameters[1] = "-dNOPAUSE";												// Do not prompt and pause for each page
+			parameters[2] = "-dBATCH";													// Terminate when accomplish.
+			parameters[3] = "-dGraphicsAlphaBits=2";									
+			parameters[4] = "-dTextAlphaBits=4";
+			parameters[5] = "-dFirstPage=" + Convert.ToInt32(inFirstPageToConvert);		// First page to convert in the PDF.
+			parameters[6] = "-dLastPage=" + Convert.ToInt32(inLastPageToConvert);		// Last page to convert in the PDF.
+			parameters[7] = "-sDEVICE=eps2write";										// Device name.
+			parameters[8] = "-sOutputFile=" + inOutputFileFullPath;						// Where to write the output.
+			parameters[9] = inPathFileToConvert;										// File to convert.
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);

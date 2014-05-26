@@ -284,10 +284,10 @@ namespace RIP2Jmage
 		{
 			// convert parameters to byte
 			if (inCommand == null) inCommand = String.Empty;
-			object commandANSI = Encoding.Default.GetBytes(inCommand);
+			object commandUTF8 = Encoding.UTF8.GetBytes(inCommand);
 
 			// create parameters as pinned allocated.
-			GCHandle commandGCHandle = GCHandle.Alloc(commandANSI, GCHandleType.Pinned);
+			GCHandle commandGCHandle = GCHandle.Alloc(commandUTF8, GCHandleType.Pinned);
 			IntPtr commandPointer = commandGCHandle.AddrOfPinnedObject();
 
 			//Run Ghostscript command
@@ -338,7 +338,7 @@ namespace RIP2Jmage
 		private GCHandle Parameters2IntPtr(string[] inParameters, GCHandle[] inParametersGCHandle)
 		{
 			int intElementCount = inParameters.Length;
-			object[] _ANSIArgs = new object[intElementCount];
+			object[] _UTF8Args = new object[intElementCount];
 			IntPtr[] argsPointers = new IntPtr[intElementCount];
 
 			// Convert parameters
@@ -346,10 +346,11 @@ namespace RIP2Jmage
 			{
 				// convert parameters to byte
 				if (inParameters[intCounter] == null) inParameters[intCounter] = String.Empty;
-				_ANSIArgs[intCounter] = Encoding.Default.GetBytes(inParameters[intCounter]);
+				
+				_UTF8Args[intCounter] = Encoding.UTF8.GetBytes(inParameters[intCounter]);
 
 				// create parameters as pinned allocated.
-				inParametersGCHandle[intCounter] = GCHandle.Alloc(_ANSIArgs[intCounter], GCHandleType.Pinned);
+				inParametersGCHandle[intCounter] = GCHandle.Alloc(_UTF8Args[intCounter], GCHandleType.Pinned);
 				argsPointers[intCounter] = inParametersGCHandle[intCounter].AddrOfPinnedObject();
 			}
 

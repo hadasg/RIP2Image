@@ -34,7 +34,7 @@ namespace RIP2Jmage
 		/// Convert PDF to JPG. 
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
-		/// <param name="inTargetFilePath">Folder path where the converted file will generate.</param>
+		/// <param name="inNewFileTargetFolderPath">Folder path where the converted file will generate.</param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		/// <param name="inGraphicsAlphaBitsValue"></param>
@@ -42,7 +42,7 @@ namespace RIP2Jmage
 		/// <param name="inQuality"></param>
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Jmage/ConvertPDF2JPG")]
-		bool ConvertPDF2JPG(string inConvertFilePath, string inTargetFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, 
+		bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, 
 							double inTextAlphaBitsValue, double inQuality);
 
 
@@ -69,12 +69,12 @@ namespace RIP2Jmage
 		///  Convert PDF to EPS.
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
-		/// <param name="inNewFileTargetFolderPath">Folder path where the converted file will generate.</param>
+		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
 		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
 		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Jmage/ConvertPDF2EPS")]
-		bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetFolderPath, int inFirstPageToConvert, int inLastPageToConvert);
+		bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to EPS.
@@ -84,10 +84,10 @@ namespace RIP2Jmage
 		/// <param name="inConvertFileWildCard"></param>
 		/// <param name="inDeleteSourcePDF"></param>
 		/// <param name="inSearchSubFolders"></param>
-		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
-		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
+		/// <param name="inFirstPageToConvert"> First page to convert in all the PDF in the given folder  </param>
+		/// <param name="inLastPageToConvert"> Last page to convert in all the PDF in the given folder  </param>
 		/// <returns></returns>
-		bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, 
-																			bool inSearchSubFolders, int inFirstPageToConvert, int inLastPageToConvert);
+		bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF,
+																			bool inSearchSubFolders, double inFirstPageToConvert, double inLastPageToConvert);
     }
 }

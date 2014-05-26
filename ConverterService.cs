@@ -47,29 +47,20 @@ namespace RIP2Jmage
 		/// </summary>
 		/// <param name="inConvertFilePath"></param>
 		/// <param name="inNewFileTargetPath"></param>
-		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			bool conversionSucceed;
 
 			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			//TODO: add logs
 
-			// Handles Unicode filename.
-			string encodedConvertFilePath = UnicodeFileNameHandle(inConvertFilePath);
-
-			// Paths preparation for file conversion.
-			string outputFileFullPath = PrePDF2JPGConvert(inNewFileTargetPath);
-			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
-
 			// Make the conversion.
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2JPG);
-			conversionSucceed = fileConvertor.ConvertPDF2JPG(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			conversionSucceed = fileConvertor.ConvertPDF2JPG(inConvertFilePath, inNewFileTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
 
-			FileMove(encodedConvertFilePath, inConvertFilePath);
-
 			// Rename JPG names to the correct page counter.
-			RenameJPGNames(inNewFileTargetPath, inConvertFilePath);
+			RenameJPGNames(inNewFileTargetFolderPath, inConvertFilePath);
 
 
 			return conversionSucceed;
@@ -97,8 +88,6 @@ namespace RIP2Jmage
 			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 			//TODO: add logs
 
-			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
-			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
 			// Convert all files in folder.
@@ -113,31 +102,18 @@ namespace RIP2Jmage
 		/// Convert PDF to EPS.
 		/// </summary>
 		/// <param name="inConvertFilePath"></param>
-		/// <param name="inNewFileTargetFolderPath"></param>
+		/// <param name="inNewFileTargetPath"></param>
 		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
 		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
 		/// <returns></returns>
-		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetFolderPath, int inFirstPageToConvert, int inLastPageToConvert)
+		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
 			bool conversionSucceed;
 
-			// Handles Unicode filename.
-			string encodedConvertFilePath = UnicodeFileNameHandle(inConvertFilePath);
-
-			// Paths preparation for file conversion.
-			string outputFileFullPath = PrePDF2EPSConvert(inNewFileTargetFolderPath);
-			encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
-
 			// Make the conversion.
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
-			conversionSucceed = fileConvertor.ConvertPDF2EPS(encodedConvertFilePath, outputFileFullPath, inFirstPageToConvert, inLastPageToConvert);
+			conversionSucceed = fileConvertor.ConvertPDF2EPS(inConvertFilePath, inNewFileTargetPath, inFirstPageToConvert, inLastPageToConvert);
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2EPS, fileConvertor);
-
-			FileMove(encodedConvertFilePath, inConvertFilePath);
-
-			// Rename EPS file to the PDF name.
-			string fileNewName = inNewFileTargetFolderPath + "\\" + Path.GetFileNameWithoutExtension(inConvertFilePath) + ".eps";
-			FileMove(outputFileFullPath, fileNewName);
 
 			return conversionSucceed;
 		}
@@ -150,15 +126,14 @@ namespace RIP2Jmage
 		/// <param name="inConvertFileWildCard"></param>
 		/// <param name="inDeleteSourcePDF"></param>
 		/// <param name="inSearchSubFolders"></param>
-		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
-		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
+		/// <param name="inFirstPageToConvert"> First page to convert in all the PDF in the given folder </param>
+		/// <param name="inLastPageToConvert"> Last page to convert in all the PDF in the given folder  </param>
 		/// <returns></returns>
-		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, bool inSearchSubFolders, int inFirstPageToConvert, int inLastPageToConvert)
+		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard,
+										 bool inDeleteSourcePDF, bool inSearchSubFolders, double inFirstPageToConvert, double inLastPageToConvert)
 		{
 			bool conversionSucceed;
 
-			inConvertFolderPath = new Uri(inConvertFolderPath).LocalPath;
-			inTargetFolderPath = new Uri(inTargetFolderPath).LocalPath;
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
 			// Convert all files in folder.
@@ -173,38 +148,6 @@ namespace RIP2Jmage
 	#endregion
 
 	#region Help Method
-
-		/// <summary>
-		/// Parameters preparation before conversion.
-		/// </summary>
-		/// <param name="inNewFileTargetPath"></param>
-		/// <returns></returns>
-		private string PrePDF2JPGConvert(string inNewFileTargetPath)
-		{
-			//We give temporary name to the JPG files we will generate so we can handle Unicode file name.
-			string fileName = "tmp-%d.jpg";
-
-			// Concatenate target path with file name.
-			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
-
-			return OutputFileFullPath.Replace("\\", "\\\\");
-		}
-
-		/// <summary>
-		/// Parameters preparation before conversion.
-		/// </summary>
-		/// <param name="inNewFileTargetPath"></param>
-		/// <returns></returns>
-		private string PrePDF2EPSConvert(string inNewFileTargetPath)
-		{
-			//We give temporary name to the EPS file we will generate so we can handle Unicode file name.
-			string fileName = "convertedEPS.eps";
-
-			// Concatenate target path with file name.
-			string OutputFileFullPath = inNewFileTargetPath + "\\" + fileName;
-
-			return OutputFileFullPath.Replace("\\", "\\\\");
-		}
 
 		/// <summary>
 		/// Check parameters validation.
@@ -266,23 +209,14 @@ namespace RIP2Jmage
 			{
 				foreach (System.IO.FileInfo file in files)
 				{
-					// Handles Unicode filename.
-					string encodedConvertFilePath = UnicodeFileNameHandle(file.FullName);
-
-					// Paths preparation for file conversion.
-					string outputFileFullPath = PrePDF2JPGConvert(inTargetFolderPath);
-					encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
-
 					// Make file conversion.
-					fileConversion = inFileConvertor.ConvertPDF2JPG(encodedConvertFilePath, outputFileFullPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+					fileConversion = inFileConvertor.ConvertPDF2JPG(file.FullName, inTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 					if (!fileConversion)
 						return false;
 
 					//Delete old files.
 					if (inDeleteSourcePDF)
-						FileDelete(encodedConvertFilePath);
-					else
-						FileMove(encodedConvertFilePath, file.FullName);  // Decode URL.
+						FileDelete(file.FullName);
 
 
 					// Rename JPG names to the correct page counter.
@@ -333,8 +267,8 @@ namespace RIP2Jmage
 		/// <param name="inFirstPageToConvert"></param>
 		/// <param name="inLastPageToConvert"></param>
 		/// <returns></returns>
-		private bool WalkDirectoryTreePDF2EPS(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard, 
-												bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, int inFirstPageToConvert, int inLastPageToConvert)
+		private bool WalkDirectoryTreePDF2EPS(FileConverter inFileConvertor, System.IO.DirectoryInfo inRoot, string inTargetFolderPath, string inConvertFileWildCard,
+												bool inDeleteSourcePDF, bool inSearchSubFolders, bool inSameTrgetFolder, double inFirstPageToConvert, double inLastPageToConvert)
 		{
 			bool fileConversion;
 
@@ -349,28 +283,17 @@ namespace RIP2Jmage
 			{
 				foreach (System.IO.FileInfo file in files)
 				{
-					// Handles Unicode filename.
-					string encodedConvertFilePath = UnicodeFileNameHandle(file.FullName);
-
-					// Paths preparation for file conversion.
-					string outputFileFullPath = PrePDF2EPSConvert(inTargetFolderPath);
-					encodedConvertFilePath = encodedConvertFilePath.Replace("\\", "\\\\");
+					// Create converted EPS path.
+					string convertedEPSPath = inTargetFolderPath + "\\" + Path.GetFileNameWithoutExtension(file.FullName) + ".eps";
 
 					// Make file conversion.
-					fileConversion = inFileConvertor.ConvertPDF2EPS(encodedConvertFilePath, outputFileFullPath, inFirstPageToConvert, inLastPageToConvert);
+					fileConversion = inFileConvertor.ConvertPDF2EPS(file.FullName, convertedEPSPath, inFirstPageToConvert, inLastPageToConvert);
 					if (!fileConversion)
 						return false;
 
 					//Delete old files.
 					if (inDeleteSourcePDF)
-						FileDelete(encodedConvertFilePath);
-					else
-						FileMove(encodedConvertFilePath, file.FullName);  // Decode URL.
-
-					// Rename EPS file to the PDF name.
-					string fileNewName = inTargetFolderPath + "\\" + Path.GetFileNameWithoutExtension(file.FullName) + ".eps";
-					//outputFileFullPath = outputFileFullPath.Replace("\\\\", "\\");
-					FileMove(outputFileFullPath, fileNewName);
+						FileDelete(file.FullName);
 				}
 
 				if (inSearchSubFolders)
@@ -403,27 +326,13 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-		/// Handles Unicode filename.
-		/// </summary>
-		/// <param name="inFilePath"></param>
-		/// <returns></returns>
-		private string UnicodeFileNameHandle(string inFilePath)
-		{
-			string fileName = Path.GetFileNameWithoutExtension(inFilePath);
-			string encodedFileName = HttpUtility.UrlEncode(fileName);
-			string encodedConvertFilePath = inFilePath.Replace(fileName, encodedFileName);
-			FileMove(inFilePath, encodedConvertFilePath);
-			return encodedConvertFilePath;
-		}
-
-		/// <summary>
 		/// Rename JPG names to the correct name and page counter.
 		/// </summary>
 		/// <param name="inFileDir">Target folder path</param>
 		/// <param name="inFileFullName">File full path name</param>
 		private void RenameJPGNames(string inFileDir, string inFileFullName)
 		{
-			string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, "tmp*");
+			string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, Path.GetFileNameWithoutExtension(inFileFullName) + "*");
 
 			int filesCounter = 1;
 			foreach (string fileName in filesNameWithTheSamePrefix)
