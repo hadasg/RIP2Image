@@ -50,8 +50,17 @@ namespace RIP2Jmage
 	{
 		static void Main()
         {
-			
 			ConverterService convert = new ConverterService();
+
+			//convert.ConvertPDF2EPS("\\\\HADASG\\XMPie\\XMPieAssets\\1\\33\\AAAA.pdf", "C:\\Users\\hadasg\\AppData\\Local\\Temp\\1\\XMPieTemp\\XMPieUniqueTemp\\0000000000000001\\AAAA.eps", 1, 1);
+			//convert.ConvertPDFFolder2EPS("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS",
+									//"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", false, true, 1, 1);
+			//convert.ConvertPDF2JPG("C:\\gs\\fonts\\ξκηςσδξκφ.pdf", "C:\\gs\\fonts", 72, 72, 2, 4, 100);
+
+			convert.ConvertPDFFolder2JPG("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS", 
+									"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", true, true, 72, 72, 2, 4, 100);
+
+			/* 19/05/14
 			convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF Process\\nieuwsbrief 2012.xlim.pdf", "C:\\gs\\XLIMTest\\PDF Process", 72, 72, 2, 4, 100);
 
 			//mulipuleFileNomTimes(10000, "1Record", "C:\\gs\\PS\\1Record.ps", "C:\\gs\\PS");
@@ -65,7 +74,7 @@ namespace RIP2Jmage
 			FileConvertor fileConverter = new FileConvertor();
 			*/
 
-
+			/* 19/05/14
 			Worker workerObject = new Worker();
 			Thread workerThread = new Thread(workerObject.DoWork1);
 			//workerThread.Start();
@@ -87,14 +96,17 @@ namespace RIP2Jmage
 			/*
 			convert.ConvertFileTypeNestedFolders(convertFolderPath, targetFolderPath, "*.pdf", "jpg");
             */
+
+			/* 19/05/14
 			sw.Stop();
             Console.WriteLine("Elapsed={0}", sw.ElapsedMilliseconds/1000);
 
 			//workerThread.Join();
 			//workerThread2.Join();
+			 19/05/14 */
 			InstancesManager.DeleteDynamicLoadingDLL();
-
-
+			 
+			 
         }
 
 		public class Worker
@@ -308,8 +320,17 @@ namespace RIP2Jmage
                 string destFile = System.IO.Path.Combine(dllTargetPath, copyDllName);   
                 System.IO.File.Copy(sourceFile, destFile, true);
             }
+		 
+		 * 
+		 * 
+		 * for (int i = 2; i <= 1000; i++)
+			{
+				string copyDllName = i + ".jpg";
+				string destFile = System.IO.Path.Combine("C:\\Users\\hadasg\\Desktop\\Features\\vPDFIIRForJPG\\Performance Issue\\Slim JPGs\\Assets", copyDllName);
+				System.IO.File.Copy("C:\\Users\\hadasg\\Desktop\\Features\\vPDFIIRForJPG\\Performance Issue\\Slim JPGs\\Assets\\1.jpg", destFile, true);
+			}
            
         }
 		 */
-    }
+	}
 }

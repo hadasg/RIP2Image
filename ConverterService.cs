@@ -25,6 +25,10 @@ using System.Text;
 using System.IO;
 using System.Web;
 using System.Threading;
+// using log4net;
+// using log4net.Config;
+
+/*[assembly: log4net.Config.XmlConfigurator(Watch = true)]*/
 
 namespace RIP2Jmage
 {
@@ -33,6 +37,8 @@ namespace RIP2Jmage
 	/// </summary>
 	class ConverterService : IConverterService
 	{
+		//private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -41,18 +47,17 @@ namespace RIP2Jmage
 		}
 
 
-	#region Methods
-		/// <summary>
-		/// Convert PDF to JPG.
-		/// </summary>
-		/// <param name="inConvertFilePath"></param>
-		/// <param name="inNewFileTargetPath"></param>
-		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		#region Methods
+		public bool ConvertPDF2JPG(string inConvertFilePath, string inNewFileTargetFolderPath, double inResolutionX, double inResolutionY, 
+									double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
+// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
+// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
+
 			bool conversionSucceed;
 
 			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			//TODO: add logs
 
 			// Make the conversion.
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2JPG);
@@ -66,28 +71,18 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-
-		/// <summary>
-		/// Convert all files type under inConvertFolderPath to JPG.
-		/// </summary>
-		/// <param name="inConvertFolderPath"></param>
-		/// <param name="inTargetFolderPath"></param>
-		/// <param name="inConvertFileWildCard"></param>
-		/// <param name="inDeleteSourcePDF"> true if want to delete source file  </param>
-		/// <param name="inSearchSubFolders"> true if want to convert PDF files in subfolders </param>
-		/// <param name="inResolutionX"></param>
-		/// <param name="inResolutionY"></param>
-		/// <param name="inGraphicsAlphaBitsValue"></param>
-		/// <param name="inTextAlphaBitsValue"></param>
-		/// <param name="inQuality"></param>
-		/// <returns></returns>
-		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, 
-										bool inSearchSubFolders, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF,
+										  bool inSearchSubFolders, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue,
+										  double inTextAlphaBitsValue, double inQuality)
 		{
+// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
+// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
+// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+// 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
+
 			bool conversionSucceed;
 
 			CheckParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
-			//TODO: add logs
 
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
@@ -99,16 +94,11 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-		/// <summary>
-		/// Convert PDF to EPS.
-		/// </summary>
-		/// <param name="inConvertFilePath"></param>
-		/// <param name="inNewFileTargetPath"></param>
-		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
-		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
-		/// <returns></returns>
 		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
+// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath +
+// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
+
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -119,20 +109,13 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-		/// <summary>
-		/// Convert all files type under inConvertFolderPath to EPS.
-		/// </summary>
-		/// <param name="inConvertFolderPath"></param>
-		/// <param name="inTargetFolderPath"></param>
-		/// <param name="inConvertFileWildCard"></param>
-		/// <param name="inDeleteSourcePDF"></param>
-		/// <param name="inSearchSubFolders"></param>
-		/// <param name="inFirstPageToConvert"> First page to convert in all the PDF in the given folder </param>
-		/// <param name="inLastPageToConvert"> Last page to convert in all the PDF in the given folder  </param>
-		/// <returns></returns>
-		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard,
-										 bool inDeleteSourcePDF, bool inSearchSubFolders, double inFirstPageToConvert, double inLastPageToConvert)
+		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF,
+																			bool inSearchSubFolders, double inFirstPageToConvert, double inLastPageToConvert)
 		{
+// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
+// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
+// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
+
 			bool conversionSucceed;
 
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
@@ -146,9 +129,9 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-	#endregion
+		#endregion
 
-	#region Help Method
+		#region Help Method
 
 		/// <summary>
 		/// Check parameters validation.
@@ -415,7 +398,7 @@ namespace RIP2Jmage
 				}
 			}
 		}
-	#endregion
+		#endregion
 
 	}
 }

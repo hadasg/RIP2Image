@@ -53,7 +53,7 @@ namespace RIP2Jmage
 		/// <param name="inTargetFolderPath"></param>
 		/// <param name="inConvertFileWildCard"></param>
 		/// <param name="inDeleteSourcePDF"></param>
-		/// <param name="inSearchSubFoldersstring"></param>
+		/// <param name="inSearchSubFolders"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
 		/// <param name="inGraphicsAlphaBitsValue"></param>
@@ -61,8 +61,8 @@ namespace RIP2Jmage
 		/// <param name="inQuality"></param>
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Jmage/ConvertPDFFolder2JPG")]
-		bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF, 
-								  bool inSearchSubFoldersstring, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, 
+		bool ConvertPDFFolder2JPG(string inConvertFolderPath, string inTargetFolderPath, string inConvertFileWildCard, bool inDeleteSourcePDF,
+								  bool inSearchSubFolders, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, 
 								  double inTextAlphaBitsValue, double inQuality);
 
 		/// <summary>
