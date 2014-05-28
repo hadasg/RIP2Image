@@ -185,7 +185,6 @@ namespace RIP2Jmage
 
 			// First, process all the files directly under this folder
 			files = inRoot.GetFiles(inConvertFileWildCard);
-			//TODO: add logs
 
 			if (files != null)
 			{
@@ -260,7 +259,6 @@ namespace RIP2Jmage
 
 			// First, process all the files directly under this folder
 			files = inRoot.GetFiles(inConvertFileWildCard);
-			//TODO: add logs
 
 			if (files != null)
 			{
