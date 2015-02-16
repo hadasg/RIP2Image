@@ -103,6 +103,30 @@ namespace RIP2Jmage
             return conversionSucceed;
         }
 
+        public bool ConvertPDF2PNGSingle(string inConvertFilePath,
+                                   string inNewFileTargetPath,
+                                   double inResolutionX,
+                                   double inResolutionY,
+                                   double inGraphicsAlphaBitsValue,
+                                   double inTextAlphaBitsValue,
+                                   int inPageNumToConvert)
+        {
+            // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
+            // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+            // 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
+
+            bool conversionSucceed;
+
+            CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+            // Make the conversion.
+            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
+            conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inPageNumToConvert);
+            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
+
+            return conversionSucceed;
+        }
+
         public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
         {
             // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath +

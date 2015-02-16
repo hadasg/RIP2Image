@@ -168,6 +168,44 @@ namespace RIP2Jmage
 			return m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString()); 
 		}
 
+
+        /// <summary>
+        /// Convert PDF to PNG - only the first page.
+        /// </summary>
+        /// <param name="inPathFileToConvert"></param>
+        /// <param name="inOutputFilePath"></param>
+        /// <param name="inResolutionX"></param>
+        /// <param name="inResolutionY"></param>
+        /// <param name="inGraphicsAlphaBitsValue"></param>
+        /// <param name="inTextAlphaBitsValue"></param>
+        /// <returns>True if conversion succeeded</returns>
+        public bool ConvertPDF2PNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, int inPageNumToConvert)
+        {
+            StringBuilder ConvertPDF2PNGSingleCommand = new StringBuilder();
+
+            // Determine which page will be converted.
+            ConvertPDF2PNGSingleCommand.Append("<< /FirstPage (" + inPageNumToConvert + ") >> setpagedevice ");
+            ConvertPDF2PNGSingleCommand.Append("<< /LastPage (" + inPageNumToConvert + ") >> setpagedevice ");
+
+            // Determine rasterisation graphic quality - values are 1, 2 or 4.
+            ConvertPDF2PNGSingleCommand.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+
+            // Determine rasterisation text quality - values are 1, 2 or 4.
+            ConvertPDF2PNGSingleCommand.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+
+            // Determine file resolution.
+            ConvertPDF2PNGSingleCommand.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+
+            // Determine new file name.
+            ConvertPDF2PNGSingleCommand.Append("<< /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+            // Convert file type.
+            ConvertPDF2PNGSingleCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+            return m_GhostscriptWrapper.RunCommand(ConvertPDF2PNGSingleCommand.ToString());
+        }
+
+
         /// <summary>
         /// Convert PDF to PNG.
         /// </summary>

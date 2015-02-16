@@ -52,7 +52,7 @@ namespace RIP2Jmage
         {
 			ConverterService convert = new ConverterService();
 
-            convert.ConvertPDF2PNG("C:\\Users\\hadasg\\Desktop\\Idan\\redCircle text 2 .pdf", "C:\\Users\\hadasg\\Desktop\\Idan\\", 150, 150, 4, 4);
+            convert.ConvertPDF2PNGSingle("C:\\Users\\hadasg\\Desktop\\Idan\\redCircle text 2 .pdf", "C:\\Users\\hadasg\\Desktop\\Idan\\hadas.png", 150, 150, 4, 4, 1);
 			//convert.ConvertPDFFolder2EPS("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS",
 									//"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", false, true, 1, 1);
 			//convert.ConvertPDF2JPG("C:\\gs\\fonts\\ξκηςσδξκφ.pdf", "C:\\gs\\fonts", 72, 72, 2, 4, 100);

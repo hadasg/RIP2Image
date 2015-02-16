@@ -69,6 +69,26 @@ namespace RIP2Jmage
 							double inTextAlphaBitsValue);
 
         /// <summary>
+        /// Convert the first page of the PDF to PNG.  
+        /// </summary>
+        /// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+        /// <param name="inNewFileTargetPath">Full path of the converted file will generate.</param>
+        /// <param name="inResolutionX"></param>
+        /// <param name="inResolutionY"></param>
+        /// <param name="inGraphicsAlphaBitsValue"></param>
+        /// <param name="inTextAlphaBitsValue"></param>
+        /// <param name="inPageNumToConvert"></param>
+        /// <returns></returns>
+        [OperationContract(Action = "RIP2Jmage/ConvertPDF2PNGSingle")]
+        bool ConvertPDF2PNGSingle(string inConvertFilePath,
+                            string inNewFileTargetPath,
+                            double inResolutionX,
+                            double inResolutionY,
+                            double inGraphicsAlphaBitsValue,
+                            double inTextAlphaBitsValue,
+                            int inPageNumToConvert);
+
+        /// <summary>
         ///  Convert PDF to EPS.
         /// </summary>
         /// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
