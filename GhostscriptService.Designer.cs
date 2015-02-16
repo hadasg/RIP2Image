@@ -49,11 +49,7 @@ namespace RIP2Jmage
         /// </summary>
         private void InitializeComponent()
         {
-            // 
-            // ConvertPDF2JPGTool
-            // 
 			this.ServiceName = "RIP2Jmage";
-
         }
 
         #endregion

@@ -33,7 +33,7 @@ namespace RIP2Jmage
 	/// </summary>
 	internal class InstancesManager
 	{
-		public enum ConversionType {PDF2JPG, PDF2EPS};
+        public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG };
 
 		/// <summary>
 		/// private constructor
@@ -44,7 +44,8 @@ namespace RIP2Jmage
 		/// Converter instances shard resource - thread safe.
 		/// </summary>
 		static private ConcurrentBag<FileConverter> m_PDF2JPGConverterInstances = new ConcurrentBag<FileConverter>();
-		static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
+        static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
+        static private ConcurrentBag<FileConverter> m_PDF2PNGConverterInstances = new ConcurrentBag<FileConverter>();
 
 		/// <summary>
 		/// Get converter instances by conversion type.
@@ -55,7 +56,9 @@ namespace RIP2Jmage
 		{
 			switch (inConversionType)
 			{
-				case ConversionType.PDF2JPG:
+                case ConversionType.PDF2PNG:
+                    return m_PDF2PNGConverterInstances;
+                case ConversionType.PDF2JPG:
 					return m_PDF2JPGConverterInstances;
 				case ConversionType.PDF2EPS:
 					return m_PDF2EPSConverterInstances;

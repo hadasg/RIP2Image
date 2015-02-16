@@ -52,13 +52,13 @@ namespace RIP2Jmage
         {
 			ConverterService convert = new ConverterService();
 
-			//convert.ConvertPDF2EPS("\\\\HADASG\\XMPie\\XMPieAssets\\1\\33\\AAAA.pdf", "C:\\Users\\hadasg\\AppData\\Local\\Temp\\1\\XMPieTemp\\XMPieUniqueTemp\\0000000000000001\\AAAA.eps", 1, 1);
+            convert.ConvertPDF2PNG("C:\\Users\\hadasg\\Desktop\\Idan\\redCircle text 2 .pdf", "C:\\Users\\hadasg\\Desktop\\Idan\\", 300, 300, 4, 4);
 			//convert.ConvertPDFFolder2EPS("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS",
 									//"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", false, true, 1, 1);
 			//convert.ConvertPDF2JPG("C:\\gs\\fonts\\ξκηςσδξκφ.pdf", "C:\\gs\\fonts", 72, 72, 2, 4, 100);
 
-			convert.ConvertPDFFolder2JPG("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS", 
-									"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", true, true, 72, 72, 2, 4, 100);
+// 			convert.ConvertPDFFolder2JPG("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS", 
+// 									"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", true, true, 72, 72, 2, 4, 100);
 
 			/* 19/05/14
 			convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF Process\\nieuwsbrief 2012.xlim.pdf", "C:\\gs\\XLIMTest\\PDF Process", 72, 72, 2, 4, 100);

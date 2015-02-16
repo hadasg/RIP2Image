@@ -49,6 +49,9 @@ namespace RIP2Jmage
 		{
 			switch (inConvertionType)
 			{
+                case InstancesManager.ConversionType.PDF2PNG:
+                    InitPDF2PNGConversion();
+                    break;
 				case InstancesManager.ConversionType.PDF2JPG:
 					InitPDF2JPGConversion();
 					break;
@@ -59,6 +62,24 @@ namespace RIP2Jmage
 					break;
 			}	  
 		}
+
+        /// <summary>
+        /// Initialize GhostscriptWrapper with relevant parameters for PDF2PNG conversion.
+        /// </summary>
+        public void InitPDF2PNGConversion()
+        {
+            Cleanup();
+
+            // Parameters creation.
+            string[] parameters = new string[4];
+            parameters[0] = "this is gs command .exe name";		// Ghostscript exe command.
+            parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page
+            parameters[2] = "-sDEVICE=pngalpha";				// what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
+            parameters[3] = "-dDOINTERPOLATE";
+
+            // Create the Ghostscript wrapper.
+            m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+        }
 
 		/// <summary>
 		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
@@ -71,7 +92,7 @@ namespace RIP2Jmage
 			string[] parameters = new string[4];
 			parameters[0] = "this is gs command .exe name";		// Ghostscript exe command.
 			parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page
-			parameters[2] = "-sDEVICE=jpeg";					// what kind of export format i should provide. For PNG use "png16m"
+			parameters[2] = "-sDEVICE=jpeg";					// what kind of export format i should provide.
 			parameters[3] = "-dDOINTERPOLATE";
 
 			// Create the Ghostscript wrapper.
@@ -111,13 +132,16 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-		/// Convert PDF to JPG.
+        /// Convert PDF to JPG.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
-		/// <param name="inOutputFileFullPath"></param>
+		/// <param name="inOutputFolderPath"></param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		/// <returns>True if conversion succeeded</returns>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+        /// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2JPG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
 			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
@@ -143,6 +167,39 @@ namespace RIP2Jmage
 
 			return m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString()); 
 		}
+
+        /// <summary>
+        /// Convert PDF to PNG.
+        /// </summary>
+        /// <param name="inPathFileToConvert"></param>
+        /// <param name="inOutputFolderPath"></param>
+        /// <param name="inResolutionX"></param>
+        /// <param name="inResolutionY"></param>
+        /// <param name="inGraphicsAlphaBitsValue"></param>
+        /// <param name="inTextAlphaBitsValue"></param>
+        /// <returns>True if conversion succeeded</returns>
+        public bool ConvertPDF2PNG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
+        {
+            StringBuilder ConvertPDF2PNGCommand = new StringBuilder();
+
+             // Determine rasterisation graphic quality - values are 1, 2 or 4.
+             ConvertPDF2PNGCommand.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+ 
+             // Determine rasterisation text quality - values are 1, 2 or 4.
+             ConvertPDF2PNGCommand.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+
+            // Determine file resolution.
+            ConvertPDF2PNGCommand.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+
+            // Determine new file name.
+            string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.png";
+            ConvertPDF2PNGCommand.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+            // Convert file type.
+            ConvertPDF2PNGCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+            return m_GhostscriptWrapper.RunCommand(ConvertPDF2PNGCommand.ToString());
+        }
 
 		/// <summary>
 		/// Convert PDF to EPS.
