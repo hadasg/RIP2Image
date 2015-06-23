@@ -52,6 +52,9 @@ namespace RIP2Jmage
                 case InstancesManager.ConversionType.PDF2PNG:
                     InitPDF2PNGConversion();
                     break;
+                case InstancesManager.ConversionType.PDF2PNGSingle:
+                    InitPDF2PNGSingleConversion();
+                    break;
 				case InstancesManager.ConversionType.PDF2JPG:
 					InitPDF2JPGConversion();
 					break;
@@ -73,9 +76,30 @@ namespace RIP2Jmage
             // Parameters creation.
             string[] parameters = new string[4];
             parameters[0] = "this is gs command .exe name";		// Ghostscript exe command.
-            parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page
+            parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page.
             parameters[2] = "-sDEVICE=pngalpha";				// what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
             parameters[3] = "-dDOINTERPOLATE";
+
+            // Create the Ghostscript wrapper.
+            m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+        }
+
+        /// <summary>
+        /// Initialize GhostscriptWrapper with relevant parameters for PDF2PNGSingle conversion.
+        /// This method convert only the first page of the PDF to PNG.
+        /// </summary>
+        public void InitPDF2PNGSingleConversion()
+        {
+            Cleanup();
+
+            // Parameters creation.
+            string[] parameters = new string[6];
+            parameters[0] = "this is gs command .exe name";		// Ghostscript exe command.
+            parameters[1] = "-dNOPAUSE";						// Do not prompt and pause for each page
+            parameters[2] = "-dFirstPage=1";		            // Convert only the first page of the PDF to PNG.
+            parameters[3] = "-dLastPage=1";		                // Convert only the first page of the PDF to PNG.
+            parameters[4] = "-sDEVICE=pngalpha";				// what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
+            parameters[5] = "-dDOINTERPOLATE";
 
             // Create the Ghostscript wrapper.
             m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
@@ -179,13 +203,9 @@ namespace RIP2Jmage
         /// <param name="inGraphicsAlphaBitsValue"></param>
         /// <param name="inTextAlphaBitsValue"></param>
         /// <returns>True if conversion succeeded</returns>
-        public bool ConvertPDF2PNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, int inPageNumToConvert)
+        public bool ConvertPDF2PNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
         {
             StringBuilder ConvertPDF2PNGSingleCommand = new StringBuilder();
-
-            // Determine which page will be converted.
-            ConvertPDF2PNGSingleCommand.Append("<< /FirstPage (" + inPageNumToConvert + ") >> setpagedevice ");
-            ConvertPDF2PNGSingleCommand.Append("<< /LastPage (" + inPageNumToConvert + ") >> setpagedevice ");
 
             // Determine rasterisation graphic quality - values are 1, 2 or 4.
             ConvertPDF2PNGSingleCommand.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");

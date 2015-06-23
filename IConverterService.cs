@@ -85,8 +85,7 @@ namespace RIP2Jmage
                             double inResolutionX,
                             double inResolutionY,
                             double inGraphicsAlphaBitsValue,
-                            double inTextAlphaBitsValue,
-                            int inPageNumToConvert);
+                            double inTextAlphaBitsValue);
 
         /// <summary>
         ///  Convert PDF to EPS.

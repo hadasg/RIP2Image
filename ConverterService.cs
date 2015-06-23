@@ -108,8 +108,7 @@ namespace RIP2Jmage
                                    double inResolutionX,
                                    double inResolutionY,
                                    double inGraphicsAlphaBitsValue,
-                                   double inTextAlphaBitsValue,
-                                   int inPageNumToConvert)
+                                   double inTextAlphaBitsValue)
         {
             // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
             // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
@@ -120,9 +119,9 @@ namespace RIP2Jmage
             CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 
             // Make the conversion.
-            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
-            conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inPageNumToConvert);
-            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
+            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNGSingle);
+            conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNGSingle, fileConvertor);
 
             return conversionSucceed;
         }
