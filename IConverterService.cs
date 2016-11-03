@@ -98,6 +98,32 @@ namespace RIP2Jmage
         [OperationContract(Action = "RIP2Jmage/ConvertPDF2EPS")]
         bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert);
 
+		/// <summary>
+		/// Convert EPS to PDF
+		/// </summary>
+        /// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+        /// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Jmage/ConvertEPS2PDF")]
+		bool ConvertEPS2PDF(string inConvertFilePath, string inNewFileTargetPath);
+
+		/// <summary>
+		/// Convert PDF to low res PDF
+		/// </summary>
+        /// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+        /// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Jmage/ConvertPDF2LowResPDF")]
+		bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath);
+
+		/// <summary>
+		/// Convert JPG to low res JPG
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Jmage/ConvertJPG2LowResJPG")]
+		bool ConvertJPG2LowResJPG(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to JPG.

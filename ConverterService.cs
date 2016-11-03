@@ -141,6 +141,49 @@ namespace RIP2Jmage
             return conversionSucceed;
         }
 
+		public bool ConvertEPS2PDF(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
+
+			bool conversionSucceed;
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.EPS2PDF);
+			conversionSucceed = fileConvertor.ConvertEPS2PDF(inConvertFilePath, inNewFileTargetPath);
+			InstancesManager.PutObject(InstancesManager.ConversionType.EPS2PDF, fileConvertor);
+
+			return conversionSucceed;
+		}
+
+
+		public bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
+
+			bool conversionSucceed;
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2LowResPDF);
+			conversionSucceed = fileConvertor.ConvertPDF2LowResPDF(inConvertFilePath, inNewFileTargetPath);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2LowResPDF, fileConvertor);
+
+			return conversionSucceed;
+		}
+
+		public bool ConvertJPG2LowResJPG(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
+
+			bool conversionSucceed;
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.JPG2LowResJPG);
+			conversionSucceed = fileConvertor.ConvertJPG2LowResJPG(inConvertFilePath, inNewFileTargetPath);
+			InstancesManager.PutObject(InstancesManager.ConversionType.JPG2LowResJPG, fileConvertor);
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, 
                                          string inTargetFolderPath, 
                                          string inConvertFileWildCard, 

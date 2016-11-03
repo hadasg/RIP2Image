@@ -61,6 +61,9 @@ namespace RIP2Jmage
 				case InstancesManager.ConversionType.PDF2EPS:
 					InitPDF2EPSConversion();			
 					break;
+				case InstancesManager.ConversionType.EPS2PDF:
+				case InstancesManager.ConversionType.PDF2LowResPDF:
+				case InstancesManager.ConversionType.JPG2LowResJPG:
 				default:
 					break;
 			}	  
@@ -281,6 +284,93 @@ namespace RIP2Jmage
 			parameters[7] = "-sDEVICE=eps2write";										// Device name.
 			parameters[8] = "-sOutputFile=" + inOutputFileFullPath;						// Where to write the output.
 			parameters[9] = inPathFileToConvert;										// File to convert.
+
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+
+			Cleanup();
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert EPS to PDF.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFileFullPath"></param>
+		/// <returns></returns>
+		public bool ConvertEPS2PDF(string inPathFileToConvert, string inOutputFileFullPath, int dpiResolution = 72)
+		{
+			// Parameters creation.
+			List<string> parameters = new List<string>();
+			parameters.Add("this is gs command .exe name");								// Ghostscript exe command.
+			parameters.Add("-dNOPAUSE");												// Do not prompt and pause for each page
+			parameters.Add("-dBATCH");													// Terminate when accomplish.
+			parameters.Add("-dPDFSETTINGS=/default");
+			parameters.Add("-r" + dpiResolution);
+			parameters.Add("-sDEVICE=pdfwrite");										// Device name.
+			parameters.Add("-sOutputFile=" + inOutputFileFullPath);						// Where to write the output.
+			parameters.Add(inPathFileToConvert);										// File to convert.
+
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper(parameters.ToArray());
+
+			Cleanup();
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert EPS to PDF.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFileFullPath"></param>
+		/// <returns></returns>
+		public bool ConvertPDF2LowResPDF(string inPathFileToConvert, string inOutputFileFullPath, int dpiResolution = 72)
+		{
+			// Parameters creation.
+			List<string> parameters = new List<string>();
+			parameters.Add("this is gs command .exe name");								// Ghostscript exe command.
+			parameters.Add("-dNOPAUSE");												// Do not prompt and pause for each page
+			parameters.Add("-dBATCH");													// Terminate when accomplish.
+			parameters.Add("-dPDFSETTINGS=/default");
+			parameters.Add("-r" + dpiResolution);
+			parameters.Add("-sDEVICE=pdfwrite");										// Device name.
+			parameters.Add("-sOutputFile=" + inOutputFileFullPath);						// Where to write the output.
+			parameters.Add(inPathFileToConvert);										// File to convert.
+
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper(parameters.ToArray());
+
+			Cleanup();
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert JPG to low res JPG.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFileFullPath"></param>
+		/// <returns></returns>
+		public bool ConvertJPG2LowResJPG(string inPathFileToConvert, string inOutputFileFullPath, int dpiResolution = 72)
+		{
+			//Command example:
+			//gswin32c -sDEVICE=jpeg -dBATCH -dNOPAUSE -r72 -sOutputFile=file.jpg viewjpeg.ps -c "(c:/photos/file.jpg) << /PageSize 2 index viewJPEGgetsize 2 array astore  >> setpagedevice viewJPEG showpage"
+
+			// Parameters creation.
+			string[] parameters = new string[11];
+			parameters[0] = "this is gs command .exe name";								// Ghostscript exe command.
+			parameters[1] = "-dNOPAUSE";												// Do not prompt and pause for each page
+			parameters[2] = "-dBATCH";													// Terminate when accomplish.
+			parameters[3] = "-dGraphicsAlphaBits=2";
+			parameters[4] = "-dTextAlphaBits=4";
+			parameters[5] = "-r" + dpiResolution;
+			parameters[6] = "-sDEVICE=jpeg";											// Device name.
+			parameters[7] = "-sOutputFile=" + inOutputFileFullPath;						// Where to write the output.
+			parameters[8] = "viewjpeg.ps";
+			parameters[9] = "-c";
+			parameters[10] = "(" + inPathFileToConvert.Replace("\\", "/") + ") << /PageSize 2 index viewJPEGgetsize 2 array astore >> setpagedevice viewJPEG showpage";
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
