@@ -197,16 +197,6 @@ namespace RIP2Jmage
 		#region Methods
 
 		/// <summary>
-		/// Constructor - getting Ghostscript parameters as input. 
-		/// </summary>
-		/// <param name="parametersList"></param>
-		public GhostscriptWrapper(string[] inParameters)
-		{
-			m_Instance = IntPtr.Zero;
-			Init(inParameters);
-		}
-
-		/// <summary>
 		/// Empty constructor.
 		/// </summary>
 		public GhostscriptWrapper()

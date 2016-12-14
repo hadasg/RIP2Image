@@ -84,7 +84,8 @@ namespace RIP2Jmage
             parameters[3] = "-dDOINTERPOLATE";
 
             // Create the Ghostscript wrapper.
-            m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			m_GhostscriptWrapper.Init(parameters);
         }
 
         /// <summary>
@@ -104,8 +105,9 @@ namespace RIP2Jmage
             parameters[4] = "-sDEVICE=pngalpha";				// what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
             parameters[5] = "-dDOINTERPOLATE";
 
-            // Create the Ghostscript wrapper.
-            m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			m_GhostscriptWrapper.Init(parameters);
         }
 
 		/// <summary>
@@ -123,7 +125,8 @@ namespace RIP2Jmage
 			parameters[3] = "-dDOINTERPOLATE";
 
 			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			m_GhostscriptWrapper.Init(parameters);
 		}
 
 		/// <summary>
@@ -286,11 +289,12 @@ namespace RIP2Jmage
 			parameters[9] = inPathFileToConvert;										// File to convert.
 
 			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			bool convertResult = m_GhostscriptWrapper.Init(parameters);
 
 			Cleanup();
 
-			return true;
+			return convertResult;
 		}
 
 		/// <summary>
@@ -313,11 +317,12 @@ namespace RIP2Jmage
 			parameters.Add(inPathFileToConvert);										// File to convert.
 
 			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(parameters.ToArray());
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			bool convertResult = m_GhostscriptWrapper.Init(parameters.ToArray());
 
 			Cleanup();
 
-			return true;
+			return convertResult;
 		}
 
 		/// <summary>
@@ -340,11 +345,12 @@ namespace RIP2Jmage
 			parameters.Add(inPathFileToConvert);										// File to convert.
 
 			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(parameters.ToArray());
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			bool convertResult = m_GhostscriptWrapper.Init(parameters.ToArray());
 
 			Cleanup();
 
-			return true;
+			return convertResult;
 		}
 
 		/// <summary>
@@ -358,6 +364,9 @@ namespace RIP2Jmage
 			//Command example:
 			//gswin32c -sDEVICE=jpeg -dBATCH -dNOPAUSE -r72 -sOutputFile=file.jpg viewjpeg.ps -c "(c:/photos/file.jpg) << /PageSize 2 index viewJPEGgetsize 2 array astore  >> setpagedevice viewJPEG showpage"
 
+			string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
+
 			// Parameters creation.
 			string[] parameters = new string[11];
 			parameters[0] = "this is gs command .exe name";								// Ghostscript exe command.
@@ -368,16 +377,17 @@ namespace RIP2Jmage
 			parameters[5] = "-r" + dpiResolution;
 			parameters[6] = "-sDEVICE=jpeg";											// Device name.
 			parameters[7] = "-sOutputFile=" + inOutputFileFullPath;						// Where to write the output.
-			parameters[8] = "viewjpeg.ps";
+			parameters[8] = exeDirectory + "\\viewjpeg.ps";
 			parameters[9] = "-c";
 			parameters[10] = "(" + inPathFileToConvert.Replace("\\", "/") + ") << /PageSize 2 index viewJPEGgetsize 2 array astore >> setpagedevice viewJPEG showpage";
 
 			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(parameters);
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			bool convertResult = m_GhostscriptWrapper.Init(parameters);
 
 			Cleanup();
 
-			return true;
+			return convertResult;
 		}
 		
 
