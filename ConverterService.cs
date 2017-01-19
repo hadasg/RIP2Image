@@ -25,6 +25,8 @@ using System.Text;
 using System.IO;
 using System.Web;
 using System.Threading;
+using System.Drawing;
+using System.Drawing.Imaging;
 // using log4net;
 // using log4net.Config;
 
@@ -48,21 +50,21 @@ namespace RIP2Jmage
 
 
 		#region Methods
-		public bool ConvertPDF2JPG(string inConvertFilePath, 
-                                   string inNewFileTargetFolderPath, 
-                                   double inResolutionX, 
-                                   double inResolutionY, 
-								   double inGraphicsAlphaBitsValue, 
-                                   double inTextAlphaBitsValue, 
-                                   double inQuality)
+		public bool ConvertPDF2JPG(string inConvertFilePath,
+								   string inNewFileTargetFolderPath,
+								   double inResolutionX,
+								   double inResolutionY,
+								   double inGraphicsAlphaBitsValue,
+								   double inTextAlphaBitsValue,
+								   double inQuality)
 		{
-            // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-            // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-            // 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
+			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
 
 			bool conversionSucceed;
 
-            CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 
 			// Make the conversion.
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2JPG);
@@ -70,76 +72,76 @@ namespace RIP2Jmage
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
 
 			// Rename JPG names to the correct page counter.
-            RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "jpg");
+			RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "jpg");
 
 
 			return conversionSucceed;
 		}
 
-        public bool ConvertPDF2PNG(string inConvertFilePath,
-                                   string inNewFileTargetFolderPath,
-                                   double inResolutionX,
-                                   double inResolutionY,
-                                   double inGraphicsAlphaBitsValue,
-                                   double inTextAlphaBitsValue)
-        {
-            // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-            // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-            // 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
+		public bool ConvertPDF2PNG(string inConvertFilePath,
+								   string inNewFileTargetFolderPath,
+								   double inResolutionX,
+								   double inResolutionY,
+								   double inGraphicsAlphaBitsValue,
+								   double inTextAlphaBitsValue)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
+			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
 
-            bool conversionSucceed;
+			bool conversionSucceed;
 
-            CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 
-            // Make the conversion.
-            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
-            conversionSucceed = fileConvertor.ConvertPDF2PNG(inConvertFilePath, inNewFileTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
-            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
+			conversionSucceed = fileConvertor.ConvertPDF2PNG(inConvertFilePath, inNewFileTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
 
-            // Rename PNG names to the correct page counter.
-            RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "png");
+			// Rename PNG names to the correct page counter.
+			RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "png");
 
 
-            return conversionSucceed;
-        }
+			return conversionSucceed;
+		}
 
-        public bool ConvertPDF2PNGSingle(string inConvertFilePath,
-                                   string inNewFileTargetPath,
-                                   double inResolutionX,
-                                   double inResolutionY,
-                                   double inGraphicsAlphaBitsValue,
-                                   double inTextAlphaBitsValue)
-        {
-            // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-            // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-            // 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
+		public bool ConvertPDF2PNGSingle(string inConvertFilePath,
+								   string inNewFileTargetPath,
+								   double inResolutionX,
+								   double inResolutionY,
+								   double inGraphicsAlphaBitsValue,
+								   double inTextAlphaBitsValue)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
+			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
 
-            bool conversionSucceed;
+			bool conversionSucceed;
 
-            CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 
-            // Make the conversion.
-            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNGSingle);
-            conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
-            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNGSingle, fileConvertor);
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNGSingle);
+			conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNGSingle, fileConvertor);
 
-            return conversionSucceed;
-        }
+			return conversionSucceed;
+		}
 
-        public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
-        {
-            // 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath +
-            // 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
+		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath +
+			// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
 
-            bool conversionSucceed;
+			bool conversionSucceed;
 
-            // Make the conversion.
-            FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
-            conversionSucceed = fileConvertor.ConvertPDF2EPS(inConvertFilePath, inNewFileTargetPath, inFirstPageToConvert, inLastPageToConvert);
-            InstancesManager.PutObject(InstancesManager.ConversionType.PDF2EPS, fileConvertor);
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
+			conversionSucceed = fileConvertor.ConvertPDF2EPS(inConvertFilePath, inNewFileTargetPath, inFirstPageToConvert, inLastPageToConvert);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2EPS, fileConvertor);
 
-            return conversionSucceed;
-        }
+			return conversionSucceed;
+		}
 
 		public bool ConvertEPS2PDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
@@ -155,6 +157,19 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
+		public bool ConvertEPS2LowResPDF(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
+
+			bool conversionSucceed;
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.EPS2LowResPDF);
+			conversionSucceed = fileConvertor.ConvertEPS2LowResPDF(inConvertFilePath, inNewFileTargetPath);
+			InstancesManager.PutObject(InstancesManager.ConversionType.EPS2LowResPDF, fileConvertor);
+
+			return conversionSucceed;
+		}
 
 		public bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
@@ -170,39 +185,85 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-		public bool ConvertJPG2LowResJPG(string inConvertFilePath, string inNewFileTargetPath)
+		public bool ConvertImage2LowResImage(string inConvertFilePath, string inNewFileTargetPath)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
-
-			bool conversionSucceed;
-
-			// Make the conversion.
-			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.JPG2LowResJPG);
-			conversionSucceed = fileConvertor.ConvertJPG2LowResJPG(inConvertFilePath, inNewFileTargetPath);
-			InstancesManager.PutObject(InstancesManager.ConversionType.JPG2LowResJPG, fileConvertor);
-
-			return conversionSucceed;
+			ImageFormat targetFormat = ImageFormat.Jpeg;
+			string typeStr = Path.GetExtension(inConvertFilePath).Substring(1).ToUpperInvariant();
+			switch (typeStr)
+			{
+				case "JPEG":
+				case "JPG":
+					targetFormat = ImageFormat.Jpeg;
+					break;
+				case "TIF":
+				case "TIFF":
+					targetFormat = ImageFormat.Tiff;
+					break;
+				case "BMP":
+					targetFormat = ImageFormat.Bmp;
+					break;
+				case "GIF":
+					targetFormat = ImageFormat.Gif;
+					break;
+				case "PNG":
+					targetFormat = ImageFormat.Png;
+					break;
+			}
+			try
+			{
+				using (Bitmap bitmap = new Bitmap(inConvertFilePath))
+				{
+					float targetResolution = 72;
+					// 96 means that windows might have failed reading the original resolution so we don't change it
+					if (bitmap.HorizontalResolution == 96 && bitmap.VerticalResolution == 96)
+						targetResolution = 96;
+					using (Bitmap smallBitmap = new Bitmap(bitmap, new Size((int)(bitmap.Width / (bitmap.HorizontalResolution / targetResolution)), (int)(bitmap.Height / (bitmap.VerticalResolution / targetResolution)))))
+					{
+						smallBitmap.SetResolution(targetResolution, targetResolution);
+						ImageCodecInfo encoder = GetEncoder(targetFormat);
+						EncoderParameters encoderParams = new EncoderParameters(1);
+						encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.ColorDepth, Image.GetPixelFormatSize(bitmap.PixelFormat));
+						smallBitmap.Save(inNewFileTargetPath, encoder, encoderParams);
+					}
+				}
+			}
+			catch
+			{
+				return false;
+			}
+			return true;
 		}
 
-		public bool ConvertPDFFolder2JPG(string inConvertFolderPath, 
-                                         string inTargetFolderPath, 
-                                         string inConvertFileWildCard, 
-                                         bool inDeleteSourcePDF,
-										 bool inSearchSubFolders, 
-                                         double inResolutionX, 
-                                         double inResolutionY, 
-                                         double inGraphicsAlphaBitsValue,
-										 double inTextAlphaBitsValue, 
-                                         double inQuality)
+		private ImageCodecInfo GetEncoder(ImageFormat format)
 		{
-            // 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
-            // 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
-            // 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-            // 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
+			ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+			foreach (ImageCodecInfo codec in codecs)
+			{
+				if (codec.FormatID == format.Guid)
+					return codec;
+			}
+			return null;
+		}
+
+		public bool ConvertPDFFolder2JPG(string inConvertFolderPath,
+										 string inTargetFolderPath,
+										 string inConvertFileWildCard,
+										 bool inDeleteSourcePDF,
+										 bool inSearchSubFolders,
+										 double inResolutionX,
+										 double inResolutionY,
+										 double inGraphicsAlphaBitsValue,
+										 double inTextAlphaBitsValue,
+										 double inQuality)
+		{
+			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
+			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
+			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+			// 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
 
 			bool conversionSucceed;
 
-            CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
 
@@ -214,17 +275,17 @@ namespace RIP2Jmage
 			return conversionSucceed;
 		}
 
-		public bool ConvertPDFFolder2EPS(string inConvertFolderPath, 
-                                         string inTargetFolderPath, 
-                                         string inConvertFileWildCard, 
-                                         bool inDeleteSourcePDF,
-										 bool inSearchSubFolders, 
-                                         double inFirstPageToConvert, 
-                                         double inLastPageToConvert)
+		public bool ConvertPDFFolder2EPS(string inConvertFolderPath,
+										 string inTargetFolderPath,
+										 string inConvertFileWildCard,
+										 bool inDeleteSourcePDF,
+										 bool inSearchSubFolders,
+										 double inFirstPageToConvert,
+										 double inLastPageToConvert)
 		{
-            // 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
-            // 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
-            // 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
+			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
+			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
+			// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
 
 			bool conversionSucceed;
 
@@ -232,7 +293,7 @@ namespace RIP2Jmage
 
 			// Convert all files in folder.
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
-			conversionSucceed = WalkDirectoryTreePDF2EPS(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, 
+			conversionSucceed = WalkDirectoryTreePDF2EPS(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders,
 														inConvertFolderPath.Equals(inTargetFolderPath), inFirstPageToConvert, inLastPageToConvert);
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
 
@@ -261,21 +322,21 @@ namespace RIP2Jmage
 				throw new ArgumentException("TextAlphaBits values are 1, 2 or 4");
 		}
 
-        /// <summary>
-        /// Check JPG parameters validation.
-        /// </summary>
-        /// <param name="inResolutionX"></param>
-        /// <param name="inResolutionY"></param>
-        /// <param name="inGraphicsAlphaBitsValue"></param>
-        /// <param name="inTextAlphaBitsValue"></param>
-        /// <param name="inQuality"></param>
-        private void CheckJPGParamValidation(double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
-        {
-            CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
-            
-            if (inQuality < 0 || inQuality > 100)
-                throw new ArgumentException("File quality range is 0-100");
-        }
+		/// <summary>
+		/// Check JPG parameters validation.
+		/// </summary>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		private void CheckJPGParamValidation(double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		{
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+			if (inQuality < 0 || inQuality > 100)
+				throw new ArgumentException("File quality range is 0-100");
+		}
 
 
 		/// <summary>
@@ -290,18 +351,18 @@ namespace RIP2Jmage
 		/// <param name="inSameTargetFolder"> If false create new sub folder under target folder path with the same name as the root sub-folder. </param>
 		/// <param name="inResolutionX"></param>
 		/// <param name="inResolutionY"></param>
-		private bool WalkDirectoryTreePDF2JPG(FileConverter inFileConvertor, 
-                                              System.IO.DirectoryInfo inRoot, 
-                                              string inTargetFolderPath, 
-                                              string inConvertFileWildCard,
-											  bool inDeleteSourcePDF, 
-                                              bool inSearchSubFolders, 
-                                              bool inSameTargetFolder, 
-                                              double inResolutionX, 
-                                              double inResolutionY, 
-											  double inGraphicsAlphaBitsValue, 
-                                              double inTextAlphaBitsValue, 
-                                              double inQuality)
+		private bool WalkDirectoryTreePDF2JPG(FileConverter inFileConvertor,
+											  System.IO.DirectoryInfo inRoot,
+											  string inTargetFolderPath,
+											  string inConvertFileWildCard,
+											  bool inDeleteSourcePDF,
+											  bool inSearchSubFolders,
+											  bool inSameTargetFolder,
+											  double inResolutionX,
+											  double inResolutionY,
+											  double inGraphicsAlphaBitsValue,
+											  double inTextAlphaBitsValue,
+											  double inQuality)
 		{
 			bool fileConversion;
 
@@ -326,7 +387,7 @@ namespace RIP2Jmage
 
 
 					// Rename JPG names to the correct page counter.
-                    RenameImagesNames(inTargetFolderPath, file.FullName, "jpg");
+					RenameImagesNames(inTargetFolderPath, file.FullName, "jpg");
 				}
 
 				if (inSearchSubFolders)
@@ -436,28 +497,25 @@ namespace RIP2Jmage
 		}
 
 		/// <summary>
-        /// Rename images names to the correct name and page counter.
+		/// Rename images names to the correct name and page counter.
 		/// </summary>
-        /// <param name="inFileDir">Target folder path</param>
-        /// <param name="inFileFullName">File full path name</param>
-        /// <param name="inFileExtension">File extension</param>
-        private void RenameImagesNames(string inFileDir, string inFileFullName, string inFileExtension)
-        {
-            string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, Path.GetFileNameWithoutExtension(inFileFullName) + "*");
+		/// <param name="inFileDir">Target folder path</param>
+		/// <param name="inFileFullName">File full path name</param>
+		/// <param name="inFileExtension">File extension</param>
+		private void RenameImagesNames(string inFileDir, string inFileFullName, string inFileExtension)
+		{
+			string[] filesNameWithTheSamePrefix = Directory.GetFiles(inFileDir, Path.GetFileNameWithoutExtension(inFileFullName) + "-*." + inFileExtension);
 
-            int filesCounter = 1;
-            foreach (string fileName in filesNameWithTheSamePrefix)
-            {
-                if (fileName.EndsWith("." + inFileExtension))
-                {
-                    string pageNumberOutputFormat = GeneratePageNumberOutputFormat(filesCounter);
-                    string fileNewName = inFileDir + "\\" + Path.GetFileNameWithoutExtension(inFileFullName) + pageNumberOutputFormat + filesCounter + "." + inFileExtension;
-                    // Rename file.
-                    FileMove(fileName, fileNewName);
-                    filesCounter++;
-                }
-            }
-        }
+			int filesCounter = 1;
+			foreach (string fileName in filesNameWithTheSamePrefix)
+			{
+				string pageNumberOutputFormat = GeneratePageNumberOutputFormat(filesCounter);
+				string fileNewName = inFileDir + "\\" + Path.GetFileNameWithoutExtension(inFileFullName) + pageNumberOutputFormat + filesCounter + "." + inFileExtension;
+				// Rename file.
+				FileMove(fileName, fileNewName);
+				filesCounter++;
+			}
+		}
 
 		/// <summary>
 		/// Generate page number prefix format. 
@@ -487,6 +545,8 @@ namespace RIP2Jmage
 			{
 				try
 				{
+					if (File.Exists(destFileName))
+						File.Delete(destFileName);
 					File.Move(sourceFileName, destFileName);
 					break;
 				}

@@ -33,23 +33,23 @@ namespace RIP2Jmage
 	/// </summary>
 	internal class InstancesManager
 	{
-        public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, JPG2LowResJPG };
+		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF };
 
 		/// <summary>
 		/// private constructor
 		/// </summary>
-		private InstancesManager(){}
+		private InstancesManager() { }
 
 		/// <summary>
 		/// Converter instances shard resource - thread safe.
 		/// </summary>
 		static private ConcurrentBag<FileConverter> m_PDF2JPGConverterInstances = new ConcurrentBag<FileConverter>();
-        static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
-        static private ConcurrentBag<FileConverter> m_PDF2PNGConverterInstances = new ConcurrentBag<FileConverter>();
-        static private ConcurrentBag<FileConverter> m_PDF2PNGSingleConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2PNGConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2PNGSingleConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_EPS2PDFConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_EPS2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
-		static private ConcurrentBag<FileConverter> m_EJPG2LowResJPGConverterInstances = new ConcurrentBag<FileConverter>();
 
 		/// <summary>
 		/// Get converter instances by conversion type.
@@ -60,23 +60,23 @@ namespace RIP2Jmage
 		{
 			switch (inConversionType)
 			{
-                case ConversionType.PDF2PNG:
-                    return m_PDF2PNGConverterInstances;
-                case ConversionType.PDF2PNGSingle:
-                    return m_PDF2PNGSingleConverterInstances;
-                case ConversionType.PDF2JPG:
+				case ConversionType.PDF2PNG:
+					return m_PDF2PNGConverterInstances;
+				case ConversionType.PDF2PNGSingle:
+					return m_PDF2PNGSingleConverterInstances;
+				case ConversionType.PDF2JPG:
 					return m_PDF2JPGConverterInstances;
 				case ConversionType.PDF2EPS:
 					return m_PDF2EPSConverterInstances;
 				case ConversionType.EPS2PDF:
 					return m_EPS2PDFConverterInstances;
+				case ConversionType.EPS2LowResPDF:
+					return m_EPS2LowResPDFConverterInstances;
 				case ConversionType.PDF2LowResPDF:
 					return m_PDF2LowResPDFConverterInstances;
-				case ConversionType.JPG2LowResJPG:
-					return m_EJPG2LowResJPGConverterInstances;
 				default:
 					return null;
-			}	  
+			}
 		}
 
 		/// <summary>
@@ -86,22 +86,22 @@ namespace RIP2Jmage
 		/// <param name="inConversionType"></param>
 		/// <returns></returns>
 		static public FileConverter GetObject(ConversionType inConversionType)
-        {
-            FileConverter fileConverter;
+		{
+			FileConverter fileConverter;
 			if (!GetConverterInstancesByType(inConversionType).TryTake(out fileConverter))
 				fileConverter = new FileConverter(inConversionType);
 			return fileConverter;
-        }
-		
+		}
+
 		/// <summary>
 		/// Return used FileConvertor to ConcurrentBag collection by conversion type.
 		/// </summary>
 		/// <param name="inConversionType"></param>
 		/// <param name="inFileConvertor"></param>
 		static public void PutObject(ConversionType inConversionType, FileConverter inFileConvertor)
-        {
+		{
 			GetConverterInstancesByType(inConversionType).Add(inFileConvertor);
-        }
+		}
 
 		/// <summary>
 		/// Delete dynamic loading dlls and their directory.

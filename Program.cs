@@ -36,9 +36,9 @@ namespace RIP2Jmage
 		static void Main()
 		{
 			ServiceBase[] ServicesToRun;
-			ServicesToRun = new ServiceBase[] 
-			{ 
-				new GhostscriptService() 
+			ServicesToRun = new ServiceBase[]
+			{
+				new GhostscriptService()
 			};
 			ServiceBase.Run(ServicesToRun);
 
@@ -48,34 +48,65 @@ namespace RIP2Jmage
 
 	static class Tester
 	{
+		[System.Runtime.InteropServices.DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto, CallingConvention = System.Runtime.InteropServices.CallingConvention.StdCall)]
+		private static extern int AllocConsole();
+
 		static void Main()
-        {
-			ConverterService convert = new ConverterService();
+		{
+			AllocConsole();
 
-            //convert.ConvertPDF2PNG("C:\\Users\\hadasg\\Desktop\\Idan\\KeyVisual_A4_Sanadermil_d.pdf", "C:\\Users\\hadasg\\Desktop\\Idan", 150, 150, 4, 4);
-            convert.ConvertPDF2PNGSingle("C:\\Users\\hadasg\\Desktop\\Idan\\cellphoneorg.pdf", "C:\\Users\\hadasg\\Desktop\\Idan\\cellphoneorg.png", 150, 150, 4, 4);
-			//convert.ConvertPDFFolder2EPS("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS",
-									//"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", false, true, 1, 1);
-           // convert.ConvertPDF2JPG("C:\\Users\\hadasg\\Desktop\\Idan\\KeyVisual_A4_Sanadermil_d.pdf", "C:\\Users\\hadasg\\Desktop\\Idan", 72, 72, 2, 4, 100);
+			string testFolder = "..\\..\\Tests\\";
+			string outputFolder = testFolder + "Output\\";
+			string inputFolder = testFolder + "Input\\";
+			int numRepeats = 10;
 
-// 			convert.ConvertPDFFolder2JPG("C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS", 
-// 									"C:\\Users\\hadasg\\Desktop\\Features\\RIP2Image Support_PDFToEPS\\Test PDF folder to EPS\\a", "*.pdf", true, true, 72, 72, 2, 4, 100);
+			if (!System.IO.Directory.Exists(testFolder))
+				System.IO.Directory.CreateDirectory(testFolder);
+			if (!System.IO.Directory.Exists(outputFolder))
+				System.IO.Directory.CreateDirectory(outputFolder);
 
-			/* 19/05/14
-			convert.ConvertPDF2JPG("C:\\gs\\XLIMTest\\PDF Process\\nieuwsbrief 2012.xlim.pdf", "C:\\gs\\XLIMTest\\PDF Process", 72, 72, 2, 4, 100);
+			System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputFolder);
+			foreach (System.IO.DirectoryInfo dir in di.GetDirectories())
+				dir.Delete(true);
+			foreach (System.IO.FileInfo file in di.GetFiles())
+				file.Delete();
 
-			//mulipuleFileNomTimes(10000, "1Record", "C:\\gs\\PS\\1Record.ps", "C:\\gs\\PS");
-           
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            //string convertFolderPath = "C:\\gs\\PDF";
-            //string targetFolderPath = "C:\\gs\\JPG";
+			Console.WriteLine("Start Test");
+			Stopwatch stopWatch = new Stopwatch();
+			Stopwatch iterationWatch = new Stopwatch();
+			TimeSpan ts;
+			stopWatch.Start();
+
+			ConverterService converter = new ConverterService();
+			for (int i = 1; i <= numRepeats; ++i)
+			{
+				iterationWatch.Reset();
+				iterationWatch.Start();
+
+				//converter.ConvertPDF2JPG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 1, 1, 72);
+				converter.ConvertPDF2LowResPDF(inputFolder + "Sample.pdf", outputFolder + i.ToString() + ".pdf");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.bmp", outputFolder + i.ToString() + ".bmp");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.jpg", outputFolder + i.ToString() + ".jpg");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.png", outputFolder + i.ToString() + ".png");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
+
+				iterationWatch.Stop();
+				ts = iterationWatch.Elapsed;
+				Console.WriteLine("RunTime iteration {0} {1:00}:{2:00}:{3:00}.{4:000}", i, ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+			}
+
+			stopWatch.Stop();
+			ts = stopWatch.Elapsed;
+			Console.WriteLine("");
+			Console.WriteLine("Total Run Time: {0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+			ts = TimeSpan.FromMilliseconds(ts.TotalMilliseconds / numRepeats);
+			Console.WriteLine("Avrag Run Time: {0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+
+			InstancesManager.DeleteDynamicLoadingDLL();
+			Console.ReadLine();
 
 			/*
-			FileConvertor fileConverter = new FileConvertor();
-			*/
-
-			/* 19/05/14
 			Worker workerObject = new Worker();
 			Thread workerThread = new Thread(workerObject.DoWork1);
 			//workerThread.Start();
@@ -94,21 +125,15 @@ namespace RIP2Jmage
 			
 			//convert.ConvertFileType("C:\\gs\\PDF\\Folder2\\2Text_graph_image_cmyk_rgb.pdf", "C:\\gs\\JPG\\Folder2", wild.Length, "jpg");
 		
-			/*
 			convert.ConvertFileTypeNestedFolders(convertFolderPath, targetFolderPath, "*.pdf", "jpg");
-            */
-
-			/* 19/05/14
+            
 			sw.Stop();
             Console.WriteLine("Elapsed={0}", sw.ElapsedMilliseconds/1000);
 
-			//workerThread.Join();
-			//workerThread2.Join();
-			 19/05/14 */
-			InstancesManager.DeleteDynamicLoadingDLL();
-			 
-			 
-        }
+			workerThread.Join();
+			workerThread2.Join();
+			*/
+		}
 
 		public class Worker
 		{

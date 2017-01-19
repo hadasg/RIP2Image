@@ -30,7 +30,7 @@ namespace RIP2Jmage
 	/// </summary>
 	internal class GhostscriptWrapper
 	{
-		
+
 		#region Native methods import Dll
 
 		/// <summary>
@@ -306,13 +306,13 @@ namespace RIP2Jmage
 
 			// Create directory for the copy dll if there isn't.
 			string dllTargetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
-			if(!Directory.Exists(dllTargetPath))
+			if (!Directory.Exists(dllTargetPath))
 				System.IO.Directory.CreateDirectory(dllTargetPath);
 
 			// Generate unique name for the copied Dll.
 			string copyDllName = "gsdll" + Guid.NewGuid() + ".dll";
 			string destFile = System.IO.Path.Combine(dllTargetPath, copyDllName);
-			
+
 			// Copy. 
 			System.IO.File.Copy(sourceFile, destFile, true);
 
@@ -336,7 +336,7 @@ namespace RIP2Jmage
 			{
 				// convert parameters to byte
 				if (inParameters[intCounter] == null) inParameters[intCounter] = String.Empty;
-				
+
 				_UTF8Args[intCounter] = Encoding.UTF8.GetBytes(inParameters[intCounter]);
 
 				// create parameters as pinned allocated.
