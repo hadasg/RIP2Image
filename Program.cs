@@ -58,7 +58,7 @@ namespace RIP2Jmage
 			string testFolder = "..\\..\\Tests\\";
 			string outputFolder = testFolder + "Output\\";
 			string inputFolder = testFolder + "Input\\";
-			int numRepeats = 10;
+			int numRepeats = 1;
 
 			if (!System.IO.Directory.Exists(testFolder))
 				System.IO.Directory.CreateDirectory(testFolder);
@@ -84,7 +84,9 @@ namespace RIP2Jmage
 				iterationWatch.Start();
 
 				//converter.ConvertPDF2JPG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 1, 1, 72);
-				converter.ConvertPDF2LowResPDF(inputFolder + "Sample.pdf", outputFolder + i.ToString() + ".pdf");
+				converter.ConvertPDF2EPS(inputFolder + "Sample.pdf", outputFolder + i.ToString() + ".ps",1,1);
+				converter.ConvertEPS2PDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + ".pdf");
+				converter.ConvertEPS2LowResPDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + "_lowres.pdf");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.bmp", outputFolder + i.ToString() + ".bmp");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.jpg", outputFolder + i.ToString() + ".jpg");

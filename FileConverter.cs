@@ -202,21 +202,24 @@ namespace RIP2Jmage
 		/// </summary>
 		public void InitPDF2EPSConversion()
 		{
+			// Need to implement in the future.
+			// GS has a bug that causes the created EPS file to be lock until quit command called.
+			// In addition, this bug prevents writing for more than one EPS file in a single run.
+			// Therefor, it's impossible to reuse a GS instance many time.
+			/*
 			Cleanup();
 
 			// Parameters creation.
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dBATCH");                                                  // Terminate when accomplish.
-			parameters.Add("-dGraphicsAlphaBits=2");
-			parameters.Add("-dTextAlphaBits=4");
 			parameters.Add("-sDEVICE=eps2write");                                       // Device name.
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper();
 			m_GhostscriptWrapper.Init(parameters.ToArray());
+			*/
 		}
 
 		/// <summary>
@@ -230,9 +233,10 @@ namespace RIP2Jmage
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dBATCH");                                                  // Terminate when accomplish.
 			parameters.Add("-dPDFSETTINGS=/default");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
+			parameters.Add("-dEPSFitPage");
+			parameters.Add("-dEPSCrop");
 			parameters.Add("-dDetectDuplicateImages=true");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
@@ -252,9 +256,10 @@ namespace RIP2Jmage
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dBATCH");                                                  // Terminate when accomplish.
 			parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
+			parameters.Add("-dEPSFitPage");
+			parameters.Add("-dEPSCrop");
 			parameters.Add("-r72x72");
 			parameters.Add("-dDownsampleColorImages=true");
 			parameters.Add("-dDownsampleGrayImages=true");
@@ -417,29 +422,25 @@ namespace RIP2Jmage
 		/// <returns></returns>
 		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
-			InitIfNeeded();
+			// Parameters creation.
+			List<string> parameters = new List<string>();
+			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
+			parameters.Add("-dNOPAUSE");                                              // Do not prompt and pause for each page
+			parameters.Add("-dBATCH");                                                  // Terminate when accomplish.
+			parameters.Add("-dFirstPage=" + Convert.ToInt32(inFirstPageToConvert));     // First page to convert in the PDF.
+			parameters.Add("-dLastPage=" + Convert.ToInt32(inLastPageToConvert));       // Last page to convert in the PDF.
+			parameters.Add("-sDEVICE=eps2write");                                       // Device name.
+			parameters.Add("-sOutputFile=" + inOutputFileFullPath);                     // Where to write the output.
+			parameters.Add(inPathFileToConvert);                                        // File to convert.
 
-			StringBuilder ConvertPDF2EPSCommand = new StringBuilder();
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			bool convertResult = m_GhostscriptWrapper.Init(parameters.ToArray());
 
-			// Determine first page
-			ConvertPDF2EPSCommand.Append("mark /FirstPage " + Convert.ToInt32(inFirstPageToConvert).ToString() + " currentdevice putdeviceprops ");
+			Cleanup();
 
-			// Determine last page
-			ConvertPDF2EPSCommand.Append("mark /LastPage " + Convert.ToInt32(inLastPageToConvert).ToString() + " currentdevice putdeviceprops ");
+			return convertResult;
 
-			// Determine new file name.
-			ConvertPDF2EPSCommand.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
-
-			// Convert file type.
-			ConvertPDF2EPSCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
-
-			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2EPSCommand.ToString());
-
-			// we need to change back the output to the just file, so the output file will be finalized and unlocked
-			if (m_LastRunSuccedded)
-				m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand("<< /OutputFile (rip2image_junk_helper) >> setpagedevice ");
-
-			return m_LastRunSuccedded;
 		}
 
 		/// <summary>
