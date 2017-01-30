@@ -190,6 +190,7 @@ namespace RIP2Jmage
 			parameters.Add("-dGrayImageResolution=72");
 			parameters.Add("-dMonoImageResolution=72");
 			parameters.Add("-dDetectDuplicateImages=true");
+			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
 			// Create the Ghostscript wrapper.
@@ -238,6 +239,7 @@ namespace RIP2Jmage
 			parameters.Add("-dEPSFitPage");
 			parameters.Add("-dEPSCrop");
 			parameters.Add("-dDetectDuplicateImages=true");
+			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
 			// Create the Ghostscript wrapper.
@@ -268,6 +270,7 @@ namespace RIP2Jmage
 			parameters.Add("-dGrayImageResolution=72");
 			parameters.Add("-dMonoImageResolution=72");
 			parameters.Add("-dDetectDuplicateImages=true");
+			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
 			// Create the Ghostscript wrapper.
