@@ -180,7 +180,7 @@ namespace RIP2Jmage
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dPDFSETTINGS=/screen");
+			//parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-r72x72");
 			parameters.Add("-dDownsampleColorImages=true");
@@ -189,6 +189,7 @@ namespace RIP2Jmage
 			parameters.Add("-dColorImageResolution=72");
 			parameters.Add("-dGrayImageResolution=72");
 			parameters.Add("-dMonoImageResolution=72");
+			parameters.Add("-dCompatibilityLevel=1.4");
 			parameters.Add("-dDetectDuplicateImages=true");
 			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
@@ -234,10 +235,11 @@ namespace RIP2Jmage
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dPDFSETTINGS=/default");
+			parameters.Add("-dPDFSETTINGS=/printer");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-dEPSFitPage");
 			parameters.Add("-dEPSCrop");
+			parameters.Add("-dCompatibilityLevel=1.4");
 			parameters.Add("-dDetectDuplicateImages=true");
 			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
@@ -258,7 +260,7 @@ namespace RIP2Jmage
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-			parameters.Add("-dPDFSETTINGS=/screen");
+			//parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-dEPSFitPage");
 			parameters.Add("-dEPSCrop");
@@ -269,6 +271,7 @@ namespace RIP2Jmage
 			parameters.Add("-dColorImageResolution=72");
 			parameters.Add("-dGrayImageResolution=72");
 			parameters.Add("-dMonoImageResolution=72");
+			parameters.Add("-dCompatibilityLevel=1.4");
 			parameters.Add("-dDetectDuplicateImages=true");
 			parameters.Add("-dAutoRotatePages=/None");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
