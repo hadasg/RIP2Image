@@ -32,7 +32,7 @@ using System.Drawing.Imaging;
 
 /*[assembly: log4net.Config.XmlConfigurator(Watch = true)]*/
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	/// <summary>
 	/// Uniting all convert utilities.

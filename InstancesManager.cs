@@ -26,7 +26,7 @@ using System.Text;
 using System.IO;
 using System.Security.AccessControl;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	/// <summary>
 	/// Manage FileConverter instances shard resource as thread safe. 

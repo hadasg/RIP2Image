@@ -24,9 +24,9 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
-	[ServiceContract(Namespace = "RIP2Jmage")]
+	[ServiceContract(Namespace = "RIP2Image")]
 	public interface IConverterService
 	{
 
@@ -41,7 +41,7 @@ namespace RIP2Jmage
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <param name="inQuality"></param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDF2JPG")]
+		[OperationContract(Action = "RIP2Image/ConvertPDF2JPG")]
 		bool ConvertPDF2JPG(string inConvertFilePath,
 							string inNewFileTargetFolderPath,
 							double inResolutionX,
@@ -60,7 +60,7 @@ namespace RIP2Jmage
 		/// <param name="inGraphicsAlphaBitsValue"></param>
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDF2PNG")]
+		[OperationContract(Action = "RIP2Image/ConvertPDF2PNG")]
 		bool ConvertPDF2PNG(string inConvertFilePath,
 							string inNewFileTargetFolderPath,
 							double inResolutionX,
@@ -79,7 +79,7 @@ namespace RIP2Jmage
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <param name="inPageNumToConvert"></param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDF2PNGSingle")]
+		[OperationContract(Action = "RIP2Image/ConvertPDF2PNGSingle")]
 		bool ConvertPDF2PNGSingle(string inConvertFilePath,
 							string inNewFileTargetPath,
 							double inResolutionX,
@@ -95,7 +95,7 @@ namespace RIP2Jmage
 		/// <param name="inFirstPageToConvert"> First page to convert in the PDF </param>
 		/// <param name="inLastPageToConvert"> Last page to convert in the PDF </param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDF2EPS")]
+		[OperationContract(Action = "RIP2Image/ConvertPDF2EPS")]
 		bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert);
 
 		/// <summary>
@@ -104,7 +104,7 @@ namespace RIP2Jmage
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
 		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertEPS2PDF")]
+		[OperationContract(Action = "RIP2Image/ConvertEPS2PDF")]
 		bool ConvertEPS2PDF(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
@@ -113,7 +113,7 @@ namespace RIP2Jmage
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
 		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertEPS2LowResPDF")]
+		[OperationContract(Action = "RIP2Image/ConvertEPS2LowResPDF")]
 		bool ConvertEPS2LowResPDF(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
@@ -122,7 +122,7 @@ namespace RIP2Jmage
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
 		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDF2LowResPDF")]
+		[OperationContract(Action = "RIP2Image/ConvertPDF2LowResPDF")]
 		bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
@@ -131,7 +131,7 @@ namespace RIP2Jmage
 		/// <param name="inConvertFilePath">Full path of the file we going to convert can be BMP, GIF, JPEG, PNG, TIFF.</param>
 		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertImage2LowResImage")]
+		[OperationContract(Action = "RIP2Image/ConvertImage2LowResImage")]
 		bool ConvertImage2LowResImage(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace RIP2Jmage
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <param name="inQuality"></param>
 		/// <returns></returns>
-		[OperationContract(Action = "RIP2Jmage/ConvertPDFFolder2JPG")]
+		[OperationContract(Action = "RIP2Image/ConvertPDFFolder2JPG")]
 		bool ConvertPDFFolder2JPG(string inConvertFolderPath,
 								  string inTargetFolderPath,
 								  string inConvertFileWildCard,

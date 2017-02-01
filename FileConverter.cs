@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	/// <summary>
 	/// Convert file type using Ghostscript.

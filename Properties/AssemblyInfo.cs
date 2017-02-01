@@ -26,13 +26,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RIP2Jmage")]
-[assembly: AssemblyDescription("RIP2Jmage")]
+[assembly: AssemblyTitle("RIP2Image")]
+[assembly: AssemblyDescription("RIP2Image")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("XMPie Ltd.")]
-[assembly: AssemblyProduct("RIP2Jmage")]
+[assembly: AssemblyProduct("RIP2Image")]
 [assembly: AssemblyCopyright("Copyright (C) 2017")]
-[assembly: AssemblyTrademark("RIP2Jmage")]
+[assembly: AssemblyTrademark("RIP2Image")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

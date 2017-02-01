@@ -19,7 +19,7 @@
 *******************************************************************************/
 
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	partial class GhostscriptService
 	{
@@ -49,7 +49,7 @@ namespace RIP2Jmage
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.ServiceName = "RIP2Jmage";
+			this.ServiceName = "RIP2Image";
 		}
 
 		#endregion

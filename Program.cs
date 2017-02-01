@@ -26,7 +26,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	static class Program
 	{

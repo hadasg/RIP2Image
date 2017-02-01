@@ -29,7 +29,7 @@ using System.Text;
 using System.ServiceModel;
 using System.IO;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	public partial class GhostscriptService : ServiceBase
     {

@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
-namespace RIP2Jmage
+namespace RIP2Image
 {
 	/// <summary>
 	/// Ghostscript wrapper for 64/32 bit.
