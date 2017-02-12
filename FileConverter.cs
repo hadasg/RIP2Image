@@ -144,6 +144,7 @@ namespace RIP2Image
 			parameters.Add("-dLastPage=1");                      // Convert only the first page of the PDF to PNG.
 			parameters.Add("-sDEVICE=pngalpha");             // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
 			parameters.Add("-dDOINTERPOLATE");
+			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
 
 			// Create the Ghostscript wrapper.
 			m_GhostscriptWrapper = new GhostscriptWrapper();
@@ -376,6 +377,10 @@ namespace RIP2Image
 			ConvertPDF2PNGSingleCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
 
 			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2PNGSingleCommand.ToString());
+
+			// we need to change back the output to the just file, so the output file will be finalized and unlocked
+			if (m_LastRunSuccedded)
+				m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand("<< /OutputFile (rip2image_junk_helper) >> setpagedevice ");
 
 			return m_LastRunSuccedded;
 		}
