@@ -126,7 +126,7 @@ namespace RIP2Image
 		bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
-		/// Convert JPG to low res JPG
+		/// Convert image to low res image
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert can be BMP, GIF, JPEG, PNG, TIFF.</param>
 		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
