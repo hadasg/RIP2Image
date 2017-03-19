@@ -217,7 +217,7 @@ namespace RIP2Image
 					// 96 means that windows might have failed reading the original resolution so we don't change it
 					if (bitmap.HorizontalResolution == 96 && bitmap.VerticalResolution == 96)
 						return false;
-					if (bitmap.HorizontalResolution < 72 || bitmap.VerticalResolution < 72)
+					if (bitmap.HorizontalResolution <= 72 || bitmap.VerticalResolution <= 72)
 						return false;
 					using (Bitmap smallBitmap = new Bitmap(bitmap, new Size((int)(bitmap.Width / (bitmap.HorizontalResolution / targetResolution)), (int)(bitmap.Height / (bitmap.VerticalResolution / targetResolution)))))
 					{
