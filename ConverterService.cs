@@ -49,7 +49,7 @@ namespace RIP2Image
 		}
 
 
-		#region Methods
+		#region Convert methods
 		public bool ConvertPDF2JPG(string inConvertFilePath,
 								   string inNewFileTargetFolderPath,
 								   double inResolutionX,
@@ -246,7 +246,9 @@ namespace RIP2Image
 			}
 			return null;
 		}
+		#endregion
 
+		#region Folder conversion.
 		public bool ConvertPDFFolder2JPG(string inConvertFolderPath,
 										 string inTargetFolderPath,
 										 string inConvertFileWildCard,
@@ -277,6 +279,35 @@ namespace RIP2Image
 			return conversionSucceed;
 		}
 
+		public bool ConvertPDFFolder2PNG(string inConvertFolderPath,
+								 string inTargetFolderPath,
+								 string inConvertFileWildCard,
+								 bool inDeleteSourcePDF,
+								 bool inSearchSubFolders,
+								 double inResolutionX,
+								 double inResolutionY,
+								 double inGraphicsAlphaBitsValue,
+								 double inTextAlphaBitsValue)
+		{
+			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
+			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
+			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
+			// 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue);
+
+			bool conversionSucceed;
+
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+
+			// Convert all files in folder.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
+			conversionSucceed = WalkDirectoryTreePDF2PNG(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertPDFFolder2EPS(string inConvertFolderPath,
 										 string inTargetFolderPath,
 										 string inConvertFileWildCard,
@@ -297,7 +328,7 @@ namespace RIP2Image
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2EPS);
 			conversionSucceed = WalkDirectoryTreePDF2EPS(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders,
 														inConvertFolderPath.Equals(inTargetFolderPath), inFirstPageToConvert, inLastPageToConvert);
-			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2JPG, fileConvertor);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2EPS, fileConvertor);
 
 			return conversionSucceed;
 		}
@@ -344,15 +375,8 @@ namespace RIP2Image
 		/// <summary>
 		/// Walking traverse all folders under inRoot looking for PDF files need to convert to JPG.
 		/// </summary>
-		/// <param name="inFileConvertor"></param>
-		/// <param name="inRoot"></param>
-		/// <param name="inTargetFolderPath"></param>
-		/// <param name="inConvertFileWildCard"></param>
-		/// <param name="inDeleteSourcePDF"></param>
 		/// <param name="inSearchSubFolders"> If true traverse each sub-folders and convert them, except if one of the sub-folders is the target folder. </param>
 		/// <param name="inSameTargetFolder"> If false create new sub folder under target folder path with the same name as the root sub-folder. </param>
-		/// <param name="inResolutionX"></param>
-		/// <param name="inResolutionY"></param>
 		private bool WalkDirectoryTreePDF2JPG(FileConverter inFileConvertor,
 											  System.IO.DirectoryInfo inRoot,
 											  string inTargetFolderPath,
@@ -414,6 +438,81 @@ namespace RIP2Image
 						{
 							// Recursive call for each subdirectory.
 							WalkDirectoryTreePDF2JPG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+						}
+
+					}
+				}
+
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Walking traverse all folders under inRoot looking for PDF files need to convert to PNG.
+		/// </summary>
+		/// <param name="inSearchSubFolders"> If true traverse each sub-folders and convert them, except if one of the sub-folders is the target folder. </param>
+		/// <param name="inSameTargetFolder"> If false create new sub folder under target folder path with the same name as the root sub-folder. </param>
+		private bool WalkDirectoryTreePDF2PNG(FileConverter inFileConvertor,
+											  System.IO.DirectoryInfo inRoot,
+											  string inTargetFolderPath,
+											  string inConvertFileWildCard,
+											  bool inDeleteSourcePDF,
+											  bool inSearchSubFolders,
+											  bool inSameTargetFolder,
+											  double inResolutionX,
+											  double inResolutionY,
+											  double inGraphicsAlphaBitsValue,
+											  double inTextAlphaBitsValue)
+		{
+			bool fileConversion;
+
+			System.IO.FileInfo[] files = null;
+			System.IO.DirectoryInfo[] subDirs = null;
+
+			// First, process all the files directly under this folder
+			files = inRoot.GetFiles(inConvertFileWildCard);
+
+			if (files != null)
+			{
+				foreach (System.IO.FileInfo file in files)
+				{
+					// Make file conversion.
+					fileConversion = inFileConvertor.ConvertPDF2PNG(file.FullName, inTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+					if (!fileConversion)
+						return false;
+
+					//Delete old files.
+					if (inDeleteSourcePDF)
+						FileDelete(file.FullName);
+
+
+					// Rename PNG names to the correct page counter.
+					RenameImagesNames(inTargetFolderPath, file.FullName, "png");
+				}
+
+				if (inSearchSubFolders)
+				{
+					// Now find all the subdirectories under this directory.
+					subDirs = inRoot.GetDirectories();
+					foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+					{
+						// In case the target folder is sub directory of the converted folder don't check it. 
+						if (inTargetFolderPath.Contains(dirInfo.FullName))
+							continue;
+						if (!inSameTargetFolder)
+						{
+							//Create a new sub folder under target folder path
+							string newPath = System.IO.Path.Combine(inTargetFolderPath, dirInfo.Name);
+							//Create the sub folder
+							System.IO.Directory.CreateDirectory(newPath);
+							//Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+						}
+						else
+						{
+							// Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
 						}
 
 					}
