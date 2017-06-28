@@ -159,6 +159,30 @@ namespace RIP2Image
 								  double inGraphicsAlphaBitsValue,
 								  double inTextAlphaBitsValue,
 								  double inQuality);
+		
+		/// <summary>
+		/// Convert all files type under inConvertFolderPath to PNG.
+		/// </summary>
+		/// <param name="inConvertFolderPath"></param>
+		/// <param name="inTargetFolderPath"></param>
+		/// <param name="inConvertFileWildCard"></param>
+		/// <param name="inDeleteSourcePDF"></param>
+		/// <param name="inSearchSubFolders"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDFFolder2PNG")]
+		bool ConvertPDFFolder2PNG(string inConvertFolderPath,
+								  string inTargetFolderPath,
+								  string inConvertFileWildCard,
+								  bool inDeleteSourcePDF,
+								  bool inSearchSubFolders,
+								  double inResolutionX,
+								  double inResolutionY,
+								  double inGraphicsAlphaBitsValue,
+								  double inTextAlphaBitsValue);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to EPS.
