@@ -57,7 +57,7 @@ namespace RIP2Image
 
 			string testFolder = "..\\..\\Tests\\";
 			string outputFolder = testFolder + "Output\\";
-			string inputFolder = testFolder + "Input\\";
+			string inputFolder = testFolder + "Input\\PNG folder";
 			int numRepeats = 1;
 
 			if (!System.IO.Directory.Exists(testFolder))
@@ -88,12 +88,12 @@ namespace RIP2Image
 				//converter.ConvertEPS2PDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + ".pdf");
 				//converter.ConvertEPS2LowResPDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + "_lowres.pdf");
 				//converter.ConvertImage2LowResImage(inputFolder + "ImageTest.jpg", inputFolder + i.ToString() + ".jpg");
-				converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
+				//converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.jpg", outputFolder + i.ToString() + ".jpg");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.png", outputFolder + i.ToString() + ".png");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
 				//converter.ConvertPDF2PNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
-
+				converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", true, true, 72, 72, 2, 4);
 
 				iterationWatch.Stop();
 				ts = iterationWatch.Elapsed;
