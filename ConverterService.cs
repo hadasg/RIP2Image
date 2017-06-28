@@ -507,12 +507,12 @@ namespace RIP2Image
 							//Create the sub folder
 							System.IO.Directory.CreateDirectory(newPath);
 							//Recursive call for each subdirectory.
-							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 						}
 						else
 						{
 							// Recursive call for each subdirectory.
-							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 						}
 
 					}
