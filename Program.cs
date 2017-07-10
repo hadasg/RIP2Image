@@ -57,7 +57,7 @@ namespace RIP2Image
 
 			string testFolder = "..\\..\\Tests\\";
 			string outputFolder = testFolder + "Output\\";
-			string inputFolder = testFolder + "Input\\PNG folder";
+			string inputFolder = testFolder + "Input\\";
 			int numRepeats = 1;
 
 			if (!System.IO.Directory.Exists(testFolder))
