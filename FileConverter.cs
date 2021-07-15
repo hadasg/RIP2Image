@@ -20,16 +20,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 
 namespace RIP2Image
 {
-	/// <summary>
-	/// Convert file type using Ghostscript.
-	/// </summary>
-	internal class FileConverter
+    /// <summary>
+    /// Convert file type using Ghostscript.
+    /// </summary>
+    internal class FileConverter
 	{
 
 		#region Class Members

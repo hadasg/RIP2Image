@@ -19,11 +19,7 @@
 *******************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Web;
 using System.Threading;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -34,10 +30,10 @@ using System.Drawing.Imaging;
 
 namespace RIP2Image
 {
-	/// <summary>
-	/// Uniting all convert utilities.
-	/// </summary>
-	class ConverterService : IConverterService
+    /// <summary>
+    /// Uniting all convert utilities.
+    /// </summary>
+    class ConverterService : IConverterService
 	{
 		//private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

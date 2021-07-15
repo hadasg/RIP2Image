@@ -19,19 +19,14 @@
 *******************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Security.AccessControl;
 
 namespace RIP2Image
 {
-	/// <summary>
-	/// Manage FileConverter instances shard resource as thread safe. 
-	/// </summary>
-	internal class InstancesManager
+    /// <summary>
+    /// Manage FileConverter instances shard resource as thread safe. 
+    /// </summary>
+    internal class InstancesManager
 	{
 		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF };
 
