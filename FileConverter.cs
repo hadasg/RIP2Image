@@ -519,11 +519,14 @@ namespace RIP2Image
 
 			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
 
-			// Determine new file name.
-			ConvertPDF2JPGCommand.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			// Make sure proofing to PDF doesn't use independent color spaces (ICCBased) and always renders to RGB
+            ConvertPDF2JPGCommand.Append("<< -dColorConversionStrategy=/RGB");
 
-			// Convert file type.
-			ConvertPDF2JPGCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+            // Determine new file name.
+            ConvertPDF2JPGCommand.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+            // Convert file type.
+            ConvertPDF2JPGCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
 
 			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString());
 
