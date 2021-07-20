@@ -517,18 +517,18 @@ namespace RIP2Image
 		{
 			InitIfNeeded();
 
-			StringBuilder ConvertPDF2JPGCommand = new StringBuilder();
+			StringBuilder ConvertPDF2LowResPDFCommand = new StringBuilder();
 
 			// Make sure proofing to PDF doesn't use independent color spaces (ICCBased) and always renders to RGB
-            ConvertPDF2JPGCommand.Append("<< -dColorConversionStrategy=/RGB");
+			ConvertPDF2LowResPDFCommand.Append("<< -dColorConversionStrategy=/RGB");
 
-            // Determine new file name.
-            ConvertPDF2JPGCommand.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			// Determine new file name.
+			ConvertPDF2LowResPDFCommand.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
 
-            // Convert file type.
-            ConvertPDF2JPGCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+			// Convert file type.
+			ConvertPDF2LowResPDFCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
 
-			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2JPGCommand.ToString());
+			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2LowResPDFCommand.ToString());
 
 			// we need to change back the output to the just file, so the output file will be finalized and unlocked
 			if (m_LastRunSuccedded)
