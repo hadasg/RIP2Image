@@ -23,12 +23,12 @@ using System.Collections.Concurrent;
 
 namespace RIP2Image
 {
-    /// <summary>
-    /// Manage FileConverter instances shard resource as thread safe. 
-    /// </summary>
-    internal class InstancesManager
+	/// <summary>
+	/// Manage FileConverter instances shard resource as thread safe. 
+	/// </summary>
+	internal class InstancesManager
 	{
-		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF };
+		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF, PDF2GrayscalePDF };
 
 		/// <summary>
 		/// private constructor
@@ -45,6 +45,7 @@ namespace RIP2Image
 		static private ConcurrentBag<FileConverter> m_EPS2PDFConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_EPS2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2GrayscalePDFConverterInstances = new ConcurrentBag<FileConverter>();
 
 		/// <summary>
 		/// Get converter instances by conversion type.
@@ -69,6 +70,8 @@ namespace RIP2Image
 					return m_EPS2LowResPDFConverterInstances;
 				case ConversionType.PDF2LowResPDF:
 					return m_PDF2LowResPDFConverterInstances;
+				case ConversionType.PDF2GrayscalePDF:
+					return m_PDF2GrayscalePDFConverterInstances;
 				default:
 					return null;
 			}

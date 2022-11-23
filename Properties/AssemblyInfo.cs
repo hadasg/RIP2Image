@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("XMPie Ltd.")]
 [assembly: AssemblyProduct("RIP2Image")]
-[assembly: AssemblyCopyright("Copyright (C) 2017-2021")]
+[assembly: AssemblyCopyright("Copyright (C) 2017-2023")]
 [assembly: AssemblyTrademark("RIP2Image")]
 [assembly: AssemblyCulture("")]
 

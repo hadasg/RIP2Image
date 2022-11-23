@@ -20,15 +20,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 
 namespace RIP2Image
 {
-    /// <summary>
-    /// Convert file type using Ghostscript.
-    /// </summary>
-    internal class FileConverter
+	/// <summary>
+	/// Convert file type using Ghostscript.
+	/// </summary>
+	internal class FileConverter
 	{
 
 		#region Class Members
@@ -100,6 +100,9 @@ namespace RIP2Image
 					break;
 				case InstancesManager.ConversionType.EPS2LowResPDF:
 					InitEPS2LowResPDFConversion();
+					break;
+				case InstancesManager.ConversionType.PDF2GrayscalePDF:
+					InitPDF2GrayscalePDFConversion();
 					break;
 				default:
 					break;
@@ -189,6 +192,32 @@ namespace RIP2Image
 			parameters.Add("-dColorImageResolution=72");
 			parameters.Add("-dGrayImageResolution=72");
 			parameters.Add("-dMonoImageResolution=72");
+			parameters.Add("-dCompatibilityLevel=1.4");
+			parameters.Add("-dDetectDuplicateImages=true");
+			parameters.Add("-dAutoRotatePages=/None");
+			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
+
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			m_GhostscriptWrapper.Init(parameters.ToArray());
+		}
+
+		/// <summary>
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
+		/// </summary>
+		public void InitPDF2GrayscalePDFConversion()
+		{
+			Cleanup();
+
+			// Parameters creation.
+			List<string> parameters = new List<string>();
+			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
+			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
+																						//parameters.Add("-dPDFSETTINGS=/screen");
+			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
+			parameters.Add("-sProcessColorModel=DeviceGray");
+			parameters.Add("-sColorConversionStrategy=Gray");
+			parameters.Add("-dOverrideICC");
 			parameters.Add("-dCompatibilityLevel=1.4");
 			parameters.Add("-dDetectDuplicateImages=true");
 			parameters.Add("-dAutoRotatePages=/None");
@@ -529,6 +558,33 @@ namespace RIP2Image
 			ConvertPDF2LowResPDFCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
 
 			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2LowResPDFCommand.ToString());
+
+			// we need to change back the output to the just file, so the output file will be finalized and unlocked
+			if (m_LastRunSuccedded)
+				m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand("<< /OutputFile (rip2image_junk_helper) >> setpagedevice ");
+
+			return m_LastRunSuccedded;
+		}
+
+		/// <summary>
+		/// Convert PDF to Grayscale PDF.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFileFullPath"></param>
+		/// <returns></returns>
+		public bool ConvertPDF2GrayscalePDF(string inPathFileToConvert, string inOutputFileFullPath)
+		{
+			InitIfNeeded();
+
+			StringBuilder ConvertPDF2GrayscaleCommand = new StringBuilder();
+
+			// Determine new file name.
+			ConvertPDF2GrayscaleCommand.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+			// Convert file type.
+			ConvertPDF2GrayscaleCommand.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+			m_LastRunSuccedded = m_GhostscriptWrapper.RunCommand(ConvertPDF2GrayscaleCommand.ToString());
 
 			// we need to change back the output to the just file, so the output file will be finalized and unlocked
 			if (m_LastRunSuccedded)

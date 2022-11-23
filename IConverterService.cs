@@ -22,7 +22,7 @@ using System.ServiceModel;
 
 namespace RIP2Image
 {
-    [ServiceContract(Namespace = "RIP2Image")]
+	[ServiceContract(Namespace = "RIP2Image")]
 	public interface IConverterService
 	{
 
@@ -122,6 +122,15 @@ namespace RIP2Image
 		bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
+		/// Convert PDF to grayscale PDF
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDF2GrayscalePDF")]
+		bool ConvertPDF2GrayscalePDF(string inConvertFilePath, string inNewFileTargetPath);
+
+		/// <summary>
 		/// Convert image to low res image
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert can be BMP, GIF, JPEG, PNG, TIFF.</param>
@@ -129,6 +138,15 @@ namespace RIP2Image
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Image/ConvertImage2LowResImage")]
 		bool ConvertImage2LowResImage(string inConvertFilePath, string inNewFileTargetPath);
+
+		/// <summary>
+		/// Convert image to grayscale image
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert can be BMP, GIF, JPEG, PNG, TIFF.</param>
+		/// <param name="inNewFileTargetPath">Full path where the converted file will generate.</param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertImage2GrayscaleImage")]
+		bool ConvertImage2GrayscaleImage(string inConvertFilePath, string inNewFileTargetPath);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to JPG.

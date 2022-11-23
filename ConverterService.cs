@@ -19,10 +19,12 @@
 *******************************************************************************/
 
 using System;
-using System.IO;
-using System.Threading;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Threading;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 // using log4net;
 // using log4net.Config;
 
@@ -30,10 +32,10 @@ using System.Drawing.Imaging;
 
 namespace RIP2Image
 {
-    /// <summary>
-    /// Uniting all convert utilities.
-    /// </summary>
-    class ConverterService : IConverterService
+	/// <summary>
+	/// Uniting all convert utilities.
+	/// </summary>
+	class ConverterService : IConverterService
 	{
 		//private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -181,6 +183,20 @@ namespace RIP2Image
 			return conversionSucceed;
 		}
 
+		public bool ConvertPDF2GrayscalePDF(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
+
+			bool conversionSucceed;
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscalePDF);
+			conversionSucceed = fileConvertor.ConvertPDF2GrayscalePDF(inConvertFilePath, inNewFileTargetPath);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscalePDF, fileConvertor);
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertImage2LowResImage(string inConvertFilePath, string inNewFileTargetPath)
 		{
 			ImageFormat targetFormat = ImageFormat.Jpeg;
@@ -224,6 +240,49 @@ namespace RIP2Image
 						smallBitmap.Save(inNewFileTargetPath, encoder, encoderParams);
 					}
 				}
+			}
+			catch
+			{
+				return false;
+			}
+			return true;
+		}
+
+		public bool ConvertImage2GrayscaleImage(string inConvertFilePath, string inNewFileTargetPath)
+		{
+			BitmapEncoder encoder = null;
+			string typeStr = Path.GetExtension(inConvertFilePath).Substring(1).ToUpperInvariant();
+			switch (typeStr)
+			{
+				case "JPEG":
+				case "JPG":
+					encoder = new JpegBitmapEncoder();
+					break;
+				case "TIF":
+				case "TIFF":
+					encoder = new TiffBitmapEncoder();
+					break;
+				case "BMP":
+					encoder = new BmpBitmapEncoder();
+					break;
+				case "GIF":
+					encoder = new GifBitmapEncoder();
+					break;
+				case "PNG":
+					encoder = new PngBitmapEncoder();
+					break;
+				default:
+					encoder = new JpegBitmapEncoder();
+					break;
+			}
+
+			try
+			{
+				BitmapImage sourceImg = new BitmapImage(new Uri(inConvertFilePath));
+				var imageConverter = new FormatConvertedBitmap(sourceImg, PixelFormats.Gray8, null, 0);
+				encoder.Frames.Add(BitmapFrame.Create(imageConverter));
+				using (FileStream fs = new FileStream(inNewFileTargetPath, FileMode.Create))
+					encoder.Save(fs);
 			}
 			catch
 			{
