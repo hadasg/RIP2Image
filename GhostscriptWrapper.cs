@@ -99,7 +99,7 @@ namespace RIP2Image
 		/// <param name="user_errors"></param>
 		/// <param name="pexit_code"></param>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate void RunCommandStringOnInstance(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
+		private delegate int RunCommandStringOnInstance(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
 
 		#endregion
 
@@ -186,9 +186,9 @@ namespace RIP2Image
 			RunCommandStringOnInstance runCommandStringOnInstance = (RunCommandStringOnInstance)Marshal.GetDelegateForFunctionPointer(
 																					pAddressOfFunctionToCall,
 																					typeof(RunCommandStringOnInstance));
-			runCommandStringOnInstance(m_Instance, inCommandPointer, 0, out exitcode);
+			int commandReturnValue = runCommandStringOnInstance(m_Instance, inCommandPointer, 0, out exitcode);
 
-			return exitcode.Equals(IntPtr.Zero);
+			return !(commandReturnValue < 0);
 		}
 
 		#endregion
@@ -236,7 +236,7 @@ namespace RIP2Image
 				parametersGCHandle[intCounter].Free();
 			argsGCHandle.Free();
 
-			return !(initReturnValue == -1);
+			return !(initReturnValue < 0);
 		}
 
 
@@ -293,6 +293,8 @@ namespace RIP2Image
 
 		#region Help Method
 
+		static readonly string gsDllName = "gsdll64";
+
 		/// <summary>
 		///	Generate unique Dll and return its path. 
 		/// </summary>
@@ -302,7 +304,7 @@ namespace RIP2Image
 			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
 
 			// The original dll.
-			string sourceFile = System.IO.Path.Combine(exeDirectory, "gsdll.dll");
+			string sourceFile = System.IO.Path.Combine(exeDirectory, gsDllName + ".dll");
 
 			// Create directory for the copy dll if there isn't.
 			string dllTargetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
@@ -310,7 +312,7 @@ namespace RIP2Image
 				System.IO.Directory.CreateDirectory(dllTargetPath);
 
 			// Generate unique name for the copied Dll.
-			string copyDllName = "gsdll" + Guid.NewGuid() + ".dll";
+			string copyDllName = gsDllName + "_" + Guid.NewGuid() + ".dll";
 			string destFile = System.IO.Path.Combine(dllTargetPath, copyDllName);
 
 			// Copy. 

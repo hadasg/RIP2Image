@@ -120,8 +120,9 @@ namespace RIP2Image
 
 			// Parameters creation.
 			List<string> parameters = new List<string>();
-			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
+			parameters.Add("this is gs command .exe name");     // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                        // Do not prompt and pause for each page.
+			parameters.Add("-dNOSAFER");                        // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			parameters.Add("-sDEVICE=pngalpha");                // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
 			parameters.Add("-dDOINTERPOLATE");
 
@@ -142,8 +143,9 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                     // Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");                     // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			parameters.Add("-dFirstPage=1");                 // Convert only the first page of the PDF to PNG.
-			parameters.Add("-dLastPage=1");                      // Convert only the first page of the PDF to PNG.
+			parameters.Add("-dLastPage=1");                  // Convert only the first page of the PDF to PNG.
 			parameters.Add("-sDEVICE=pngalpha");             // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
 			parameters.Add("-dDOINTERPOLATE");
 			parameters.Add("-sOutputFile=" + "rip2image_junk_helper");                  // we must set the output at init stage, so we put a junk file, just for the init to successed
@@ -164,6 +166,7 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                     // Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");                     // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			parameters.Add("-sDEVICE=jpeg");                 // what kind of export format i should provide.
 			parameters.Add("-dDOINTERPOLATE");
 
@@ -183,6 +186,7 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");										        // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			//parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-r72x72");
@@ -213,7 +217,8 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
-																						//parameters.Add("-dPDFSETTINGS=/screen");
+			parameters.Add("-dNOSAFER");											    // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+			//parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-sProcessColorModel=DeviceGray");
 			parameters.Add("-sColorConversionStrategy=Gray");
@@ -264,6 +269,7 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");												// This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			parameters.Add("-dPDFSETTINGS=/printer");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-dEPSFitPage");
@@ -289,6 +295,7 @@ namespace RIP2Image
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
 			parameters.Add("-dNOPAUSE");                                                // Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");											    // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			//parameters.Add("-dPDFSETTINGS=/screen");
 			parameters.Add("-sDEVICE=pdfwrite");                                        // Device name.
 			parameters.Add("-dEPSFitPage");
@@ -464,7 +471,8 @@ namespace RIP2Image
 			// Parameters creation.
 			List<string> parameters = new List<string>();
 			parameters.Add("this is gs command .exe name");                             // Ghostscript exe command.
-			parameters.Add("-dNOPAUSE");                                              // Do not prompt and pause for each page
+			parameters.Add("-dNOPAUSE");												// Do not prompt and pause for each page
+			parameters.Add("-dNOSAFER");											    // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 			parameters.Add("-dBATCH");                                                  // Terminate when accomplish.
 			parameters.Add("-dFirstPage=" + Convert.ToInt32(inFirstPageToConvert));     // First page to convert in the PDF.
 			parameters.Add("-dLastPage=" + Convert.ToInt32(inLastPageToConvert));       // Last page to convert in the PDF.
