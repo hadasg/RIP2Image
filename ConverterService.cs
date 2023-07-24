@@ -56,10 +56,6 @@ namespace RIP2Image
 								   double inTextAlphaBitsValue,
 								   double inQuality)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
-
 			bool conversionSucceed;
 
 			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
@@ -83,10 +79,6 @@ namespace RIP2Image
 								   double inGraphicsAlphaBitsValue,
 								   double inTextAlphaBitsValue)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
-
 			bool conversionSucceed;
 
 			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
@@ -110,10 +102,6 @@ namespace RIP2Image
 								   double inGraphicsAlphaBitsValue,
 								   double inTextAlphaBitsValue)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetFolderPath = " + inNewFileTargetFolderPath +
-			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-			// 						", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ");
-
 			bool conversionSucceed;
 
 			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
@@ -128,9 +116,6 @@ namespace RIP2Image
 
 		public bool ConvertPDF2EPS(string inConvertFilePath, string inNewFileTargetPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath +
-			// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
-
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -143,8 +128,6 @@ namespace RIP2Image
 
 		public bool ConvertEPS2PDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
-
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -157,8 +140,6 @@ namespace RIP2Image
 
 		public bool ConvertEPS2LowResPDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
-
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -171,8 +152,6 @@ namespace RIP2Image
 
 		public bool ConvertPDF2LowResPDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
-
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -185,8 +164,6 @@ namespace RIP2Image
 
 		public bool ConvertPDF2GrayscalePDF(string inConvertFilePath, string inNewFileTargetPath)
 		{
-			// 			logger.Info("inConvertFilePath = " + inConvertFilePath + ", inNewFileTargetPath = " + inNewFileTargetPath);
-
 			bool conversionSucceed;
 
 			// Make the conversion.
@@ -241,8 +218,9 @@ namespace RIP2Image
 					}
 				}
 			}
-			catch
+			catch(Exception ex)
 			{
+				Logger.LogError("ConverterService.ConvertImage2LowResImage - {0}", Logger.GetMostInnerMessage(ex));
 				return false;
 			}
 			return true;
@@ -284,8 +262,9 @@ namespace RIP2Image
 				using (FileStream fs = new FileStream(inNewFileTargetPath, FileMode.Create))
 					encoder.Save(fs);
 			}
-			catch
+			catch(Exception ex)
 			{
+				Logger.LogError("ConverterService.ConvertImage2GrayscaleImage - {0}", Logger.GetMostInnerMessage(ex));
 				return false;
 			}
 			return true;
@@ -315,11 +294,6 @@ namespace RIP2Image
 										 double inTextAlphaBitsValue,
 										 double inQuality)
 		{
-			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
-			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
-			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-			// 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue + ", inQuality = " + inQuality);
-
 			bool conversionSucceed;
 
 			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
@@ -344,11 +318,6 @@ namespace RIP2Image
 								 double inGraphicsAlphaBitsValue,
 								 double inTextAlphaBitsValue)
 		{
-			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
-			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
-			// 						", inResolutionX = " + inResolutionX + ", inResolutionY = " + inResolutionY + ", inGraphicsAlphaBitsValue = " + inGraphicsAlphaBitsValue +
-			// 						 ", inTextAlphaBitsValue = " + inTextAlphaBitsValue);
-
 			bool conversionSucceed;
 
 			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
@@ -371,10 +340,6 @@ namespace RIP2Image
 										 double inFirstPageToConvert,
 										 double inLastPageToConvert)
 		{
-			// 			logger.Info("inConvertFolderPath = " + inConvertFolderPath + ", inTargetFolderPath = " + inTargetFolderPath +
-			// 						", inConvertFileWildCard = " + inConvertFileWildCard + ", inDeleteSourcePDF = " + inDeleteSourcePDF + ", inSearchSubFolders = " + inSearchSubFolders +
-			// 						", inFirstPageToConvert = " + inFirstPageToConvert + ", inLastPageToConvert = " + inLastPageToConvert);
-
 			bool conversionSucceed;
 
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);

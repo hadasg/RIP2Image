@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace RIP2Image
 {
@@ -39,7 +40,7 @@ namespace RIP2Image
 		/// <param name="dllToLoad"></param>
 		/// <returns></returns>
 		[DllImport("kernel32.dll")]
-		public static extern IntPtr LoadLibrary(string dllToLoad);
+		private static extern IntPtr LoadLibrary(string dllToLoad);
 
 		/// <summary>
 		/// Obtain the address of an exported function within the previously loaded dll.
@@ -48,7 +49,7 @@ namespace RIP2Image
 		/// <param name="procedureName"></param>
 		/// <returns></returns>
 		[DllImport("kernel32.dll")]
-		public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+		private static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
 
 		/// <summary>
 		/// Releases the DLL loaded by the LoadLibrary function.
@@ -56,7 +57,7 @@ namespace RIP2Image
 		/// <param name="hModule"></param>
 		/// <returns></returns>
 		[DllImport("kernel32.dll")]
-		public static extern bool FreeLibrary(IntPtr hModule);
+		private static extern bool FreeLibrary(IntPtr hModule);
 
 		#endregion
 
@@ -70,26 +71,26 @@ namespace RIP2Image
 		/// <param name="caller_handle"></param>
 		/// <returns></returns>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate int CreateNewGhostscriptInstance(out IntPtr pinstance, IntPtr caller_handle);
+		private delegate int gsapi_new_instance(out IntPtr pinstance, IntPtr caller_handle);
 
 
 		/// <summary>Inisilaize Ghostscript arguments.</summary>
 		/// <param name="instance"></param><param name="argc"></param><param name="argv"></param>
 		/// <returns>0 if is ok</returns>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate int InitInstanceWithArgs(IntPtr instance, int argc, IntPtr argv);
+		private delegate int gsapi_init_with_args(IntPtr instance, int argc, IntPtr argv);
 
 
 		/// <summary>ExitGSInstance the interpreter.</summary>
 		/// <param name="instance"></param><returns></returns>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate int Exit(IntPtr instance);
+		private delegate int gsapi_exit(IntPtr instance);
 
 
 		/// <summary>Destroy an instance of Ghostscript.</summary>
 		/// <param name="instance"></param>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate void DeleteInstance(IntPtr instance);
+		private delegate void gsapi_delete_instance(IntPtr instance);
 
 		/// <summary>
 		/// Run Ghostscript command.
@@ -99,7 +100,7 @@ namespace RIP2Image
 		/// <param name="user_errors"></param>
 		/// <param name="pexit_code"></param>
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-		private delegate int RunCommandStringOnInstance(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
+		private delegate int gsapi_run_string(IntPtr gsInstance, IntPtr commandString, int user_errors, out IntPtr pexit_code);
 
 		#endregion
 
@@ -130,37 +131,78 @@ namespace RIP2Image
 		/// <summary>
 		///  Create new Ghostscript instance using Ghostscript import Dll.
 		/// </summary>
-		private void CreateNewGSInstance()
+		private bool CreateNewGSInstance()
 		{
-			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_new_instance");
-			CreateNewGhostscriptInstance createNewGhostscriptInstance = (CreateNewGhostscriptInstance)Marshal.GetDelegateForFunctionPointer(
-																					pAddressOfFunctionToCall,
-																					typeof(CreateNewGhostscriptInstance));
+			try
+			{
+				IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_new_instance");
+				gsapi_new_instance createNewGhostscriptInstance = Marshal.GetDelegateForFunctionPointer<gsapi_new_instance>(pAddressOfFunctionToCall);
 
-			createNewGhostscriptInstance(out m_Instance, IntPtr.Zero);
+				createNewGhostscriptInstance(out m_Instance, IntPtr.Zero);
+
+				if(m_Instance == IntPtr.Zero)
+				{
+					Logger.LogError("GhostscriptWrapper.CreateNewGSInstance - failed to create instance");
+					return false;
+				}
+
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.CreateNewGSInstance - {0}", Logger.GetMostInnerMessage(ex));
+			}
+
+			return false;
 		}
 
 		/// <summary>
-		/// Inisilaize Ghostscript instance with arguments using Ghostscript import Dll.
+		/// Initialize Ghostscript instance with arguments using Ghostscript import Dll.
 		/// </summary>
 		/// <param name="inParametersLength"></param>
 		/// <param name="inArgvPointer"></param>
 		/// <returns></returns>
 		private int InitGSInstanceWithArgs(int inParametersLength, IntPtr inArgvPointer)
 		{
-			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_init_with_args");
-			InitInstanceWithArgs initInstanceWithArgs = (InitInstanceWithArgs)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(InitInstanceWithArgs));
-			return initInstanceWithArgs(m_Instance, inParametersLength, inArgvPointer);
+			try
+			{
+				IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_init_with_args");
+				gsapi_init_with_args initInstanceWithArgs = Marshal.GetDelegateForFunctionPointer<gsapi_init_with_args>(pAddressOfFunctionToCall);
+				return initInstanceWithArgs(m_Instance, inParametersLength, inArgvPointer);
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.InitGSInstanceWithArgs - {0}", Logger.GetMostInnerMessage(ex));
+			}
+
+			return -1;
 		}
 
 		/// <summary>
-		/// Exit Ghostscript Instance using Ghostscript import Dll.
+		/// gsapi_exit Ghostscript Instance using Ghostscript import Dll.
 		/// </summary>
-		private void ExitGSInstance()
+		private bool ExitGSInstance()
 		{
-			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_exit");
-			Exit exit = (Exit)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(Exit));
-			exit(m_Instance);
+			try
+			{
+				IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_exit");
+				gsapi_exit exit = Marshal.GetDelegateForFunctionPointer<gsapi_exit>(pAddressOfFunctionToCall);
+				int commandReturnValue = exit(m_Instance);
+
+				if (commandReturnValue < 0)
+				{
+					Logger.LogError("GhostscriptWrapper.ExitGSInstance - failed with code {0}", commandReturnValue);
+					return false;
+				}
+
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.ExitGSInstance - {0}", Logger.GetMostInnerMessage(ex));
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -168,9 +210,16 @@ namespace RIP2Image
 		/// </summary>
 		private void DeleteGSInstance()
 		{
-			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_delete_instance");
-			DeleteInstance deleteInstance = (DeleteInstance)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(DeleteInstance));
-			deleteInstance(m_Instance);
+			try
+			{
+				IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_delete_instance");
+				gsapi_delete_instance deleteInstance = Marshal.GetDelegateForFunctionPointer<gsapi_delete_instance>(pAddressOfFunctionToCall);
+				deleteInstance(m_Instance);
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.DeleteGSInstance - {0}", Logger.GetMostInnerMessage(ex));
+			}
 		}
 
 		/// <summary>
@@ -180,15 +229,28 @@ namespace RIP2Image
 		/// <returns></returns>
 		private bool RunGSCommandStringOnInstance(IntPtr inCommandPointer)
 		{
-			IntPtr exitcode;
+			try
+			{
+				IntPtr exitcode;
 
-			IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_run_string");
-			RunCommandStringOnInstance runCommandStringOnInstance = (RunCommandStringOnInstance)Marshal.GetDelegateForFunctionPointer(
-																					pAddressOfFunctionToCall,
-																					typeof(RunCommandStringOnInstance));
-			int commandReturnValue = runCommandStringOnInstance(m_Instance, inCommandPointer, 0, out exitcode);
+				IntPtr pAddressOfFunctionToCall = GetProcAddress(m_LibraryPointerDll, "gsapi_run_string");
+				gsapi_run_string runCommandStringOnInstance = Marshal.GetDelegateForFunctionPointer<gsapi_run_string>(pAddressOfFunctionToCall);
+				int commandReturnValue = runCommandStringOnInstance(m_Instance, inCommandPointer, 0, out exitcode);
 
-			return !(commandReturnValue < 0);
+				if(commandReturnValue < 0)
+				{
+					Logger.LogError("GhostscriptWrapper.RunGSCommandStringOnInstance - failed with code {0}", commandReturnValue);
+					return false;
+				}
+
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.RunGSCommandStringOnInstance - {0}", Logger.GetMostInnerMessage(ex));
+			}
+
+			return false;
 		}
 
 		#endregion
@@ -218,25 +280,44 @@ namespace RIP2Image
 			m_LibraryPointerDll = LoadLibrary(m_GSDllPath);
 			// Error report - couldn't load library
 			if (m_LibraryPointerDll == IntPtr.Zero)
+			{
+				Logger.LogError("GhostscriptWrapper.Init - failed to load dll {0}", m_GSDllPath);
 				return false;
+			}
 
 			// Create new Ghostscript instance.
-			CreateNewGSInstance();
+			if (!CreateNewGSInstance())
+				return false;
 
-			// create the parameters as pinned allocated.
-			GCHandle[] parametersGCHandle = new GCHandle[inParameters.Length];
-			GCHandle argsGCHandle = Parameters2IntPtr(inParameters, parametersGCHandle);
-			IntPtr argvPointer = argsGCHandle.AddrOfPinnedObject();
+			try
+			{
+				// create the parameters as pinned allocated.
+				GCHandle[] parametersGCHandle = new GCHandle[inParameters.Length];
+				GCHandle argsGCHandle = Parameters2IntPtr(inParameters, parametersGCHandle);
+				IntPtr argvPointer = argsGCHandle.AddrOfPinnedObject();
 
-			// initialize the instance.
-			int initReturnValue = InitGSInstanceWithArgs(inParameters.Length, argvPointer);
+				// initialize the instance.
+				int initReturnValue = InitGSInstanceWithArgs(inParameters.Length, argvPointer);
 
-			// clear memory.
-			for (int intCounter = 0; intCounter < parametersGCHandle.Length; intCounter++)
-				parametersGCHandle[intCounter].Free();
-			argsGCHandle.Free();
+				// clear memory.
+				for (int intCounter = 0; intCounter < parametersGCHandle.Length; intCounter++)
+					parametersGCHandle[intCounter].Free();
+				argsGCHandle.Free();
 
-			return !(initReturnValue < 0);
+				if (initReturnValue < 0)
+				{
+					Logger.LogError("GhostscriptWrapper.Init - failed with code {0}", initReturnValue);
+					return false;
+				}
+
+				return !(initReturnValue < 0);
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.Init - {0}", Logger.GetMostInnerMessage(ex));
+			}
+
+			return false;
 		}
 
 
@@ -252,8 +333,17 @@ namespace RIP2Image
 				DeleteGSInstance();
 
 				// Free loaded library and delete Dll file. 
-				FreeLibrary(m_LibraryPointerDll);
-				File.Delete(m_GSDllPath);
+				if(!FreeLibrary(m_LibraryPointerDll))
+					Logger.LogError("GhostscriptWrapper.Cleanup - failed to unload {0}", m_GSDllPath);
+
+				try
+				{
+					File.Delete(m_GSDllPath);
+				}
+				catch (System.Exception ex)
+				{
+					Logger.LogError("GhostscriptWrapper.Cleanup - {0}", Logger.GetMostInnerMessage(ex));
+				}
 			}
 			m_Instance = IntPtr.Zero;
 		}
@@ -293,18 +383,19 @@ namespace RIP2Image
 
 		#region Help Method
 
-		static readonly string gsDllName = "gsdll64";
+		static private readonly string m_GsDllName = "gsdll64";
+		static private int m_DllInstance = 0;
 
 		/// <summary>
 		///	Generate unique Dll and return its path. 
 		/// </summary>
-		public string GenerateUniqueDll()
+		private string GenerateUniqueDll()
 		{
 			string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
 
 			// The original dll.
-			string sourceFile = System.IO.Path.Combine(exeDirectory, gsDllName + ".dll");
+			string sourceFile = System.IO.Path.Combine(exeDirectory, m_GsDllName + ".dll");
 
 			// Create directory for the copy dll if there isn't.
 			string dllTargetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
@@ -312,7 +403,7 @@ namespace RIP2Image
 				System.IO.Directory.CreateDirectory(dllTargetPath);
 
 			// Generate unique name for the copied Dll.
-			string copyDllName = gsDllName + "_" + Guid.NewGuid() + ".dll";
+			string copyDllName = m_GsDllName + "_" + Interlocked.Increment(ref m_DllInstance).ToString() + ".dll";
 			string destFile = System.IO.Path.Combine(dllTargetPath, copyDllName);
 
 			// Copy. 
@@ -360,12 +451,17 @@ namespace RIP2Image
 		/// </summary>
 		public static void DeleteDllDirectory()
 		{
-			string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-			string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
-			string targetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
-			if (Directory.Exists(targetPath))
+			try
 			{
-				System.IO.Directory.Delete(targetPath, true);
+				string fullExeNameAndPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+				string exeDirectory = System.IO.Path.GetDirectoryName(fullExeNameAndPath);
+				string targetPath = System.IO.Path.Combine(exeDirectory, "Dynamic Loading DLL");
+				if (Directory.Exists(targetPath))
+					System.IO.Directory.Delete(targetPath, true);
+			}
+			catch (System.Exception ex)
+			{
+				Logger.LogError("GhostscriptWrapper.DeleteDllDirectory - {0}", Logger.GetMostInnerMessage(ex));
 			}
 		}
 

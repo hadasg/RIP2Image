@@ -39,6 +39,8 @@ namespace RIP2Image
                 _serviceHost.Close();
             }
 
+            Logger.LogImportantMessage("Service Started");
+
 			//Delete previous dynamic loading DLLs if there are any.
 			InstancesManager.DeleteDynamicLoadingDLL();
 
@@ -57,6 +59,8 @@ namespace RIP2Image
 				InstancesManager.DeleteDynamicLoadingDLL();
                 _serviceHost = null;
             }
-        }
+
+			Logger.LogImportantMessage("Service Ended");
+		}
     }
 }
