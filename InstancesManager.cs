@@ -110,7 +110,7 @@ namespace RIP2Image
 			FileConverter fileConverter;
 			foreach (ConversionType type in Enum.GetValues(typeof(ConversionType)))
 				while (GetConverterInstancesByType(type).TryTake(out fileConverter))
-					fileConverter.Cleanup();
+					fileConverter.Dispose();
 
 			// Delete dlls's directory
 			GhostscriptWrapper.DeleteDllDirectory();
