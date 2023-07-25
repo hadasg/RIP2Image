@@ -19,7 +19,9 @@
 *******************************************************************************/
 
 using System;
+using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -116,6 +118,16 @@ namespace RIP2Image
 		private IntPtr m_GSLoadedDll;
 
 		/// <summary>
+		/// A partial log message
+		/// </summary>
+		private string m_LogMessagePart;
+
+		/// <summary>
+		/// A partial log error message
+		/// </summary>
+		private string m_LogErrorMessagePart;
+
+		/// <summary>
 		/// constructor.
 		/// </summary>
 		public GhostscriptWrapper()
@@ -187,6 +199,10 @@ namespace RIP2Image
 			if (AddressOfFunctionToCall != IntPtr.Zero)
 				m_gsapi_run_string = Marshal.GetDelegateForFunctionPointer<gsapi_run_string_delegate>(AddressOfFunctionToCall);
 
+			AddressOfFunctionToCall = GetProcAddress(m_GSLoadedDll, "gsapi_set_stdio");
+			if (AddressOfFunctionToCall != IntPtr.Zero)
+				m_gsapi_set_stdio = Marshal.GetDelegateForFunctionPointer<gsapi_set_stdio_delegate>(AddressOfFunctionToCall);
+
 			gs_error_type code = gsapi_new_instance();
 			if (code != gs_error_type.gs_error_ok)
 				Logger.LogError("GhostscriptWrapper.constructor - gsapi_new_instance return error {0} for Instance {1}", code.ToString(), m_InstanceId);
@@ -194,6 +210,13 @@ namespace RIP2Image
 			code = gsapi_set_arg_encoding(gsEncoding.GS_ARG_ENCODING_UTF8);
 			if (code != gs_error_type.gs_error_ok)
 				Logger.LogError("GhostscriptWrapper.constructor - gsapi_set_arg_encoding return error {0} for Instance {1}", code.ToString(), m_InstanceId);
+
+			if (ConfigurationManager.AppSettings["redirectstdio"] == "true")
+			{
+				code = gsapi_set_stdio();
+				if (code != gs_error_type.gs_error_ok)
+					Logger.LogError("GhostscriptWrapper.constructor - gsapi_set_stdio return error {0} for Instance {1}", code.ToString(), m_InstanceId);
+			}
 		}
 
 		/// <summary>
@@ -522,6 +545,74 @@ namespace RIP2Image
 			gs_error_type retVal = (gs_error_type)m_gsapi_run_string(m_Instance, messageGCHandle.AddrOfPinnedObject(), 0, ref exitcode);
 			messageGCHandle.Free();
 			return retVal;
+		}
+
+		public delegate int gs_stdio_handler(IntPtr caller_handle, IntPtr buffer, int len);
+
+		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
+		private delegate int gsapi_set_stdio_delegate(IntPtr instance, gs_stdio_handler stdin, gs_stdio_handler stdout, gs_stdio_handler stderr);
+
+		private gsapi_set_stdio_delegate m_gsapi_set_stdio;
+
+		private gs_error_type gsapi_set_stdio()
+		{
+			return (gs_error_type)m_gsapi_set_stdio(m_Instance, stdin_callback, stdout_callback, stderr_callback);
+		}
+
+		private int stdin_callback(IntPtr handle, IntPtr pointer, int count)
+		{
+			Marshal.PtrToStringAnsi(pointer);
+			return count;
+		}
+
+		char[] s_LineBreak = new char[] { '\n' };
+
+		private int stdout_callback(IntPtr handle, IntPtr pointer, int count)
+		{
+			string message = Marshal.PtrToStringAnsi(pointer);
+			if (string.IsNullOrEmpty(message))
+				return count;
+
+			if (!string.IsNullOrEmpty(m_LogMessagePart))
+				message = m_LogMessagePart + message;
+			m_LogMessagePart = null;
+
+			string[] lines = message.Split(s_LineBreak, StringSplitOptions.RemoveEmptyEntries);
+			for (int i = 0; i < lines.Length; ++i)
+			{
+				if(i == (lines.Length-1) && message.Last() != s_LineBreak[0])
+				{
+					m_LogMessagePart = lines[i];
+					continue;
+				}
+				Logger.LogExtendedMessage("GS message for instance {0}: {1}", m_InstanceId, lines[i]);
+			}
+
+			return count;
+		}
+
+		private int stderr_callback(IntPtr handle, IntPtr pointer, int count)
+		{
+			string message = Marshal.PtrToStringAnsi(pointer);
+			if (string.IsNullOrEmpty(message))
+				return count;
+
+			if (!string.IsNullOrEmpty(m_LogErrorMessagePart))
+				message = m_LogErrorMessagePart + message;
+			m_LogErrorMessagePart = null;
+
+			string[] lines = message.Split(s_LineBreak, StringSplitOptions.RemoveEmptyEntries);
+			for (int i = 0; i < lines.Length; ++i)
+			{
+				if (i == (lines.Length - 1) && message.Last() != s_LineBreak[0])
+				{
+					m_LogErrorMessagePart = lines[i];
+					continue;
+				}
+				Logger.LogError("GS error message for instance {0}: {1}", m_InstanceId, lines[i]);
+			}
+
+			return count;
 		}
 
 		/// <summary>
