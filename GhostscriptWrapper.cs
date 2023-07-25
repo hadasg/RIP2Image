@@ -141,7 +141,7 @@ namespace RIP2Image
 			m_GSLoadedDll = LoadLibrary(m_GSDllFile);
 			if (m_GSLoadedDll == IntPtr.Zero)
 			{
-				Logger.LogError("GhostscriptWrapper.GhostscriptWrapper - failed to load dll {0}", m_GSDllFile);
+				Logger.LogError("GhostscriptWrapper.GhostscriptWrapper - failed to load dll {0} for Instance {1}", m_GSDllFile, m_InstanceId);
 				return;
 			}
 
@@ -189,11 +189,11 @@ namespace RIP2Image
 
 			gs_error_type code = gsapi_new_instance();
 			if (code != gs_error_type.gs_error_ok)
-				Logger.LogError("GhostscriptWrapper.constructor - gsapi_new_instance return error {0}", code.ToString());
+				Logger.LogError("GhostscriptWrapper.constructor - gsapi_new_instance return error {0} for Instance {1}", code.ToString(), m_InstanceId);
 
 			code = gsapi_set_arg_encoding(gsEncoding.GS_ARG_ENCODING_UTF8);
 			if (code != gs_error_type.gs_error_ok)
-				Logger.LogError("GhostscriptWrapper.constructor - gsapi_set_arg_encoding return error {0}", code.ToString());
+				Logger.LogError("GhostscriptWrapper.constructor - gsapi_set_arg_encoding return error {0} for Instance {1}", code.ToString(), m_InstanceId);
 		}
 
 		/// <summary>
@@ -206,7 +206,7 @@ namespace RIP2Image
 			{
 				gs_error_type code = gsapi_exit();
 				if(code != gs_error_type.gs_error_ok)
-					Logger.LogError("GhostscriptWrapper.Dispose - gsapi_exit return error {0}", code.ToString());
+					Logger.LogError("GhostscriptWrapper.Dispose - gsapi_exit return error {0} for Instance {1}", code.ToString(), m_InstanceId);
 
 				gsapi_delete_instance();
 			}
@@ -214,7 +214,7 @@ namespace RIP2Image
 			if(m_GSLoadedDll != IntPtr.Zero)
 			{
 				if (!FreeLibrary(m_GSLoadedDll))
-					Logger.LogError("GhostscriptWrapper.Dispose - failed to unload {0}", m_GSDllFile);
+					Logger.LogError("GhostscriptWrapper.Dispose - failed to unload {0} for Instance {1}", m_GSDllFile, m_InstanceId);
 				m_GSLoadedDll = IntPtr.Zero;
 
 				try
@@ -223,7 +223,7 @@ namespace RIP2Image
 				}
 				catch (System.Exception ex)
 				{
-					Logger.LogError("GhostscriptWrapper.Dispose - {0}", Logger.GetMostInnerMessage(ex));
+					Logger.LogError("GhostscriptWrapper.Dispose - {0} for Instance {1}", Logger.GetMostInnerMessage(ex), m_InstanceId);
 				}
 
 				try
@@ -232,7 +232,7 @@ namespace RIP2Image
 				}
 				catch (System.Exception ex)
 				{
-					Logger.LogWarning("GhostscriptWrapper.Dispose - {0}", Logger.GetMostInnerMessage(ex));
+					Logger.LogWarning("GhostscriptWrapper.Dispose - {0} for Instance {1}", Logger.GetMostInnerMessage(ex), m_InstanceId);
 				}
 			}
 		}

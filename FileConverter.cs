@@ -131,7 +131,7 @@ namespace RIP2Image
 
 			if(code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2PNGConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2PNGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -159,7 +159,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2PNGSingleConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2PNGSingleConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -183,7 +183,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2JPGConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2JPGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -217,7 +217,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2LowResPDFConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2LowResPDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -248,7 +248,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2GrayscalePDFConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2GrayscalePDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -278,7 +278,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitPDF2EPSConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitPDF2EPSConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 			*/
@@ -309,7 +309,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitEPS2PDFConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitEPS2PDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -346,7 +346,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.InitEPS2LowResPDFConversion - gsapi_init_with_args return error {0}", code.ToString());
+				Logger.LogError("FileConverter.InitEPS2LowResPDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 				return false;
 			}
 
@@ -410,7 +410,7 @@ namespace RIP2Image
 			if(code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded =  false;
-				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -463,7 +463,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -513,7 +513,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -549,7 +549,7 @@ namespace RIP2Image
 
 				if (code != gs_error_type.gs_error_ok)
 				{
-					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0}", code.ToString());
+					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 					return false;
 				}
 			}
@@ -585,7 +585,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertEPS2PDF - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertEPS2PDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -623,7 +623,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertEPS2LowResPDF - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertEPS2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -664,7 +664,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2LowResPDF - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertPDF2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
@@ -702,7 +702,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2GrayscalePDF - gsapi_run_string_with_length return error {0}", code.ToString());
+				Logger.LogError("FileConverter.ConvertPDF2GrayscalePDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
 			}
 			else
 			{
