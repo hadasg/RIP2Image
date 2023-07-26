@@ -90,7 +90,8 @@ namespace RIP2Image
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
 				//converter.ConvertPDF2PNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
 				//converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", true, true, 72, 72, 2, 4);
-				converter.ConvertPDF2GrayscalePDF(inputFolder + "Sample.pdf", outputFolder + "Sample.pdf");
+				//converter.ConvertPDF2GrayscalePDF(inputFolder + "Sample.pdf", outputFolder + "Sample.pdf");
+				converter.ConvertPDF2JPG(inputFolder + "Sample2.pdf", outputFolder, 72, 72, 1, 1, 72);
 
 				iterationWatch.Stop();
 				ts = iterationWatch.Elapsed;

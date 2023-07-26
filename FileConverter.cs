@@ -117,6 +117,12 @@ namespace RIP2Image
 					return InitEPS2LowResPDFConversion();
 				case InstancesManager.ConversionType.PDF2GrayscalePDF:
 					return InitPDF2GrayscalePDFConversion();
+				case InstancesManager.ConversionType.PDF2GrayscalePNG:
+					return InitPDF2GrayscalePNGConversion();
+				case InstancesManager.ConversionType.PDF2GrayscalePNGSingle:
+					return InitPDF2GrayscalePNGSingleConversion();
+				case InstancesManager.ConversionType.PDF2GrayscaleJPG:
+					return InitPDF2GrayscaleJPGConversion();
 			}
 
 			return false;
@@ -253,6 +259,84 @@ namespace RIP2Image
 		}
 
 		/// <summary>
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
+		/// </summary>
+		private bool InitPDF2GrayscaleJPGConversion()
+		{
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
+				"gswin64.exe",                              // Ghostscript exe command.
+				"-dNOPAUSE",                                // Do not prompt and pause for each page.
+				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+				"-sDEVICE=jpeggray",                        // what kind of export format i should provide.
+				"-dDOINTERPOLATE"
+				);
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				Logger.LogError("FileConverter.InitPDF2JPGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert PDF to JPG.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFolderPath"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		/// <returns>True if conversion succeeded</returns>
+		public bool ConvertPDF2GrayscaleJPG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
+		{
+			m_LastRunSuccedded = InitIfNeeded();
+			if (!m_LastRunSuccedded)
+				return false;
+
+			StringBuilder command = new StringBuilder();
+
+			// Determine rasterization graphic quality - values are 1, 2 or 4.
+			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine rasterization text quality - values are 1, 2 or 4.
+			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine file quality the range is 0-100.
+			command.Append("mark /JPEGQ " + inQuality + " currentdevice putdeviceprops ");
+
+			// Determine file resolution.
+			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+
+			// Determine new file name.
+			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.jpg";
+			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+			// Convert file type.
+			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+			gs_error_type code = m_GhostscriptWrapper.gsapi_run_string_with_length(command.ToString());
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				m_LastRunSuccedded = false;
+				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+			}
+			else
+			{
+				m_LastRunSuccedded = true;
+			}
+
+
+			return m_LastRunSuccedded;
+		}
+
+		/// <summary>
 		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNGSingle conversion.
 		/// This method convert only the first page of the PDF to PNG.
 		/// </summary>
@@ -329,6 +413,82 @@ namespace RIP2Image
 		}
 
 		/// <summary>
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNGSingle conversion.
+		/// This method convert only the first page of the PDF to PNG.
+		/// </summary>
+		private bool InitPDF2GrayscalePNGSingleConversion()
+		{
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
+				"gswin64.exe",                              // Ghostscript exe command.
+				"-dNOPAUSE",                                // Do not prompt and pause for each page.
+				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+				"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
+				"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
+				"-sDEVICE=pnggray",							// what kind of export format i should provide.
+				"-dDOINTERPOLATE",
+				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+				);
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				Logger.LogError("FileConverter.InitPDF2PNGSingleConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert PDF to PNG - only the first page.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFilePath"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns>True if conversion succeeded</returns>
+		public bool ConvertPDF2GrayscalePNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
+		{
+			m_LastRunSuccedded = InitIfNeeded();
+			if (!m_LastRunSuccedded)
+				return false;
+
+			StringBuilder command = new StringBuilder();
+
+			// Determine rasterization graphic quality - values are 1, 2 or 4.
+			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine rasterization text quality - values are 1, 2 or 4.
+			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine file resolution.
+			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+
+			// Determine new file name.
+			command.Append("<< /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+			// Convert file type.
+			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+			gs_error_type code = m_GhostscriptWrapper.gsapi_run_string_with_length(command.ToString());
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				m_LastRunSuccedded = false;
+				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+			}
+			else
+			{
+				m_LastRunSuccedded = true;
+			}
+
+			return m_LastRunSuccedded;
+		}
+
+		/// <summary>
 		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNG conversion.
 		/// </summary>
 		private bool InitPDF2PNGConversion()
@@ -363,6 +523,79 @@ namespace RIP2Image
 		/// <param name="inTextAlphaBitsValue"></param>
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2PNG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
+		{
+			m_LastRunSuccedded = InitIfNeeded();
+			if (!m_LastRunSuccedded)
+				return false;
+
+			StringBuilder command = new StringBuilder();
+
+			// Determine rasterization graphic quality - values are 1, 2 or 4.
+			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine rasterization text quality - values are 1, 2 or 4.
+			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+
+			// Determine file resolution.
+			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+
+			// Determine new file name.
+			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.png";
+			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+
+			// Convert file type.
+			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
+
+			gs_error_type code = m_GhostscriptWrapper.gsapi_run_string_with_length(command.ToString());
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				m_LastRunSuccedded = false;
+				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+			}
+			else
+			{
+				m_LastRunSuccedded = true;
+			}
+
+			return m_LastRunSuccedded;
+		}
+
+		/// <summary>
+		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNG conversion.
+		/// </summary>
+		private bool InitPDF2GrayscalePNGConversion()
+		{
+			// Create the Ghostscript wrapper.
+			m_GhostscriptWrapper = new GhostscriptWrapper();
+			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
+				"gswin64.exe",                          // Ghostscript exe command.
+				"-dNOPAUSE",                            // Do not prompt and pause for each page.
+				"-dNOSAFER",                            // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+				"-sDEVICE=pnggray",                    // what kind of export format i should provide.
+				"-dDOINTERPOLATE"
+				);
+
+			if (code != gs_error_type.gs_error_ok)
+			{
+				Logger.LogError("FileConverter.InitPDF2PNGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Convert PDF to PNG.
+		/// </summary>
+		/// <param name="inPathFileToConvert"></param>
+		/// <param name="inOutputFolderPath"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns>True if conversion succeeded</returns>
+		public bool ConvertPDF2GrayscalePNG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
 		{
 			m_LastRunSuccedded = InitIfNeeded();
 			if (!m_LastRunSuccedded)

@@ -72,6 +72,30 @@ namespace RIP2Image
 			return conversionSucceed;
 		}
 
+		public bool ConvertPDF2GrayscaleJPG(string inConvertFilePath,
+										   string inNewFileTargetFolderPath,
+										   double inResolutionX,
+										   double inResolutionY,
+										   double inGraphicsAlphaBitsValue,
+										   double inTextAlphaBitsValue,
+										   double inQuality)
+		{
+			bool conversionSucceed;
+
+			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscaleJPG);
+			conversionSucceed = fileConvertor.ConvertPDF2GrayscaleJPG(inConvertFilePath, inNewFileTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscaleJPG, fileConvertor);
+
+			// Rename JPG names to the correct page counter.
+			RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "jpg");
+
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertPDF2PNG(string inConvertFilePath,
 								   string inNewFileTargetFolderPath,
 								   double inResolutionX,
@@ -95,6 +119,29 @@ namespace RIP2Image
 			return conversionSucceed;
 		}
 
+		public bool ConvertPDF2GrayscalePNG(string inConvertFilePath,
+										   string inNewFileTargetFolderPath,
+										   double inResolutionX,
+										   double inResolutionY,
+										   double inGraphicsAlphaBitsValue,
+										   double inTextAlphaBitsValue)
+		{
+			bool conversionSucceed;
+
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscalePNG);
+			conversionSucceed = fileConvertor.ConvertPDF2GrayscalePNG(inConvertFilePath, inNewFileTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscalePNG, fileConvertor);
+
+			// Rename PNG names to the correct page counter.
+			RenameImagesNames(inNewFileTargetFolderPath, inConvertFilePath, "png");
+
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertPDF2PNGSingle(string inConvertFilePath,
 								   string inNewFileTargetPath,
 								   double inResolutionX,
@@ -110,6 +157,25 @@ namespace RIP2Image
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNGSingle);
 			conversionSucceed = fileConvertor.ConvertPDF2PNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNGSingle, fileConvertor);
+
+			return conversionSucceed;
+		}
+
+		public bool ConvertPDF2GrayscalePNGSingle(string inConvertFilePath,
+												string inNewFileTargetPath,
+												double inResolutionX,
+												double inResolutionY,
+												double inGraphicsAlphaBitsValue,
+												double inTextAlphaBitsValue)
+		{
+			bool conversionSucceed;
+
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+			// Make the conversion.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscalePNGSingle);
+			conversionSucceed = fileConvertor.ConvertPDF2GrayscalePNGSingle(inConvertFilePath, inNewFileTargetPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscalePNGSingle, fileConvertor);
 
 			return conversionSucceed;
 		}
@@ -308,15 +374,40 @@ namespace RIP2Image
 			return conversionSucceed;
 		}
 
+		public bool ConvertPDFFolder2GrayscaleJPG(string inConvertFolderPath,
+												 string inTargetFolderPath,
+												 string inConvertFileWildCard,
+												 bool inDeleteSourcePDF,
+												 bool inSearchSubFolders,
+												 double inResolutionX,
+												 double inResolutionY,
+												 double inGraphicsAlphaBitsValue,
+												 double inTextAlphaBitsValue,
+												 double inQuality)
+		{
+			bool conversionSucceed;
+
+			CheckJPGParamValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+
+			// Convert all files in folder.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscaleJPG);
+			conversionSucceed = WalkDirectoryTreePDF2GrayscaleJPG(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscaleJPG, fileConvertor);
+
+			return conversionSucceed;
+		}
+
 		public bool ConvertPDFFolder2PNG(string inConvertFolderPath,
-								 string inTargetFolderPath,
-								 string inConvertFileWildCard,
-								 bool inDeleteSourcePDF,
-								 bool inSearchSubFolders,
-								 double inResolutionX,
-								 double inResolutionY,
-								 double inGraphicsAlphaBitsValue,
-								 double inTextAlphaBitsValue)
+										 string inTargetFolderPath,
+										 string inConvertFileWildCard,
+										 bool inDeleteSourcePDF,
+										 bool inSearchSubFolders,
+										 double inResolutionX,
+										 double inResolutionY,
+										 double inGraphicsAlphaBitsValue,
+										 double inTextAlphaBitsValue)
 		{
 			bool conversionSucceed;
 
@@ -328,6 +419,30 @@ namespace RIP2Image
 			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2PNG);
 			conversionSucceed = WalkDirectoryTreePDF2PNG(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2PNG, fileConvertor);
+
+			return conversionSucceed;
+		}
+
+		public bool ConvertPDFFolder2GrayscalePNG(string inConvertFolderPath,
+												 string inTargetFolderPath,
+												 string inConvertFileWildCard,
+												 bool inDeleteSourcePDF,
+												 bool inSearchSubFolders,
+												 double inResolutionX,
+												 double inResolutionY,
+												 double inGraphicsAlphaBitsValue,
+												 double inTextAlphaBitsValue)
+		{
+			bool conversionSucceed;
+
+			CheckBaseParamsValidation(inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(inConvertFolderPath);
+
+			// Convert all files in folder.
+			FileConverter fileConvertor = InstancesManager.GetObject(InstancesManager.ConversionType.PDF2GrayscalePNG);
+			conversionSucceed = WalkDirectoryTreePDF2GrayscalePNG(fileConvertor, root, inTargetFolderPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inConvertFolderPath.Equals(inTargetFolderPath), inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+			InstancesManager.PutObject(InstancesManager.ConversionType.PDF2GrayscalePNG, fileConvertor);
 
 			return conversionSucceed;
 		}
@@ -469,6 +584,82 @@ namespace RIP2Image
 		}
 
 		/// <summary>
+		/// Walking traverse all folders under inRoot looking for PDF files need to convert to JPG.
+		/// </summary>
+		/// <param name="inSearchSubFolders"> If true traverse each sub-folders and convert them, except if one of the sub-folders is the target folder. </param>
+		/// <param name="inSameTargetFolder"> If false create new sub folder under target folder path with the same name as the root sub-folder. </param>
+		private bool WalkDirectoryTreePDF2GrayscaleJPG(FileConverter inFileConvertor,
+													  System.IO.DirectoryInfo inRoot,
+													  string inTargetFolderPath,
+													  string inConvertFileWildCard,
+													  bool inDeleteSourcePDF,
+													  bool inSearchSubFolders,
+													  bool inSameTargetFolder,
+													  double inResolutionX,
+													  double inResolutionY,
+													  double inGraphicsAlphaBitsValue,
+													  double inTextAlphaBitsValue,
+													  double inQuality)
+		{
+			bool fileConversion;
+
+			System.IO.FileInfo[] files = null;
+			System.IO.DirectoryInfo[] subDirs = null;
+
+			// First, process all the files directly under this folder
+			files = inRoot.GetFiles(inConvertFileWildCard);
+
+			if (files != null)
+			{
+				foreach (System.IO.FileInfo file in files)
+				{
+					// Make file conversion.
+					fileConversion = inFileConvertor.ConvertPDF2GrayscaleJPG(file.FullName, inTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+					if (!fileConversion)
+						return false;
+
+					//Delete old files.
+					if (inDeleteSourcePDF)
+						FileDelete(file.FullName);
+
+
+					// Rename JPG names to the correct page counter.
+					RenameImagesNames(inTargetFolderPath, file.FullName, "jpg");
+				}
+
+				if (inSearchSubFolders)
+				{
+					// Now find all the subdirectories under this directory.
+					subDirs = inRoot.GetDirectories();
+					foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+					{
+						// In case the target folder is sub directory of the converted folder don't check it. 
+						if (inTargetFolderPath.Contains(dirInfo.FullName))
+							continue;
+						if (!inSameTargetFolder)
+						{
+							//Create a new sub folder under target folder path
+							string newPath = System.IO.Path.Combine(inTargetFolderPath, dirInfo.Name);
+							//Create the sub folder
+							System.IO.Directory.CreateDirectory(newPath);
+							//Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2GrayscaleJPG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+						}
+						else
+						{
+							// Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2GrayscaleJPG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue, inQuality);
+						}
+
+					}
+				}
+
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Walking traverse all folders under inRoot looking for PDF files need to convert to PNG.
 		/// </summary>
 		/// <param name="inSearchSubFolders"> If true traverse each sub-folders and convert them, except if one of the sub-folders is the target folder. </param>
@@ -533,6 +724,81 @@ namespace RIP2Image
 						{
 							// Recursive call for each subdirectory.
 							WalkDirectoryTreePDF2PNG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+						}
+
+					}
+				}
+
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Walking traverse all folders under inRoot looking for PDF files need to convert to PNG.
+		/// </summary>
+		/// <param name="inSearchSubFolders"> If true traverse each sub-folders and convert them, except if one of the sub-folders is the target folder. </param>
+		/// <param name="inSameTargetFolder"> If false create new sub folder under target folder path with the same name as the root sub-folder. </param>
+		private bool WalkDirectoryTreePDF2GrayscalePNG(FileConverter inFileConvertor,
+													  System.IO.DirectoryInfo inRoot,
+													  string inTargetFolderPath,
+													  string inConvertFileWildCard,
+													  bool inDeleteSourcePDF,
+													  bool inSearchSubFolders,
+													  bool inSameTargetFolder,
+													  double inResolutionX,
+													  double inResolutionY,
+													  double inGraphicsAlphaBitsValue,
+													  double inTextAlphaBitsValue)
+		{
+			bool fileConversion;
+
+			System.IO.FileInfo[] files = null;
+			System.IO.DirectoryInfo[] subDirs = null;
+
+			// First, process all the files directly under this folder
+			files = inRoot.GetFiles(inConvertFileWildCard);
+
+			if (files != null)
+			{
+				foreach (System.IO.FileInfo file in files)
+				{
+					// Make file conversion.
+					fileConversion = inFileConvertor.ConvertPDF2GrayscalePNG(file.FullName, inTargetFolderPath, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+					if (!fileConversion)
+						return false;
+
+					//Delete old files.
+					if (inDeleteSourcePDF)
+						FileDelete(file.FullName);
+
+
+					// Rename PNG names to the correct page counter.
+					RenameImagesNames(inTargetFolderPath, file.FullName, "png");
+				}
+
+				if (inSearchSubFolders)
+				{
+					// Now find all the subdirectories under this directory.
+					subDirs = inRoot.GetDirectories();
+					foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+					{
+						// In case the target folder is sub directory of the converted folder don't check it. 
+						if (inTargetFolderPath.Contains(dirInfo.FullName))
+							continue;
+						if (!inSameTargetFolder)
+						{
+							//Create a new sub folder under target folder path
+							string newPath = System.IO.Path.Combine(inTargetFolderPath, dirInfo.Name);
+							//Create the sub folder
+							System.IO.Directory.CreateDirectory(newPath);
+							//Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2GrayscalePNG(inFileConvertor, dirInfo, newPath, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
+						}
+						else
+						{
+							// Recursive call for each subdirectory.
+							WalkDirectoryTreePDF2GrayscalePNG(inFileConvertor, dirInfo, dirInfo.FullName, inConvertFileWildCard, inDeleteSourcePDF, inSearchSubFolders, inSameTargetFolder, inResolutionX, inResolutionY, inGraphicsAlphaBitsValue, inTextAlphaBitsValue);
 						}
 
 					}

@@ -28,7 +28,7 @@ namespace RIP2Image
 	/// </summary>
 	internal class InstancesManager
 	{
-		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF, PDF2GrayscalePDF };
+		public enum ConversionType { PDF2JPG, PDF2EPS, PDF2PNG, PDF2PNGSingle, EPS2PDF, PDF2LowResPDF, EPS2LowResPDF, PDF2GrayscalePDF, PDF2GrayscaleJPG, PDF2GrayscalePNG, PDF2GrayscalePNGSingle };
 
 		/// <summary>
 		/// private constructor
@@ -39,9 +39,12 @@ namespace RIP2Image
 		/// Converter instances shard resource - thread safe.
 		/// </summary>
 		static private ConcurrentBag<FileConverter> m_PDF2JPGConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2GrayscaleJPGConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2EPSConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2PNGConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2GrayscalePNGConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2PNGSingleConverterInstances = new ConcurrentBag<FileConverter>();
+		static private ConcurrentBag<FileConverter> m_PDF2GrayscalePNGSingleConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_EPS2PDFConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_EPS2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
 		static private ConcurrentBag<FileConverter> m_PDF2LowResPDFConverterInstances = new ConcurrentBag<FileConverter>();
@@ -72,6 +75,12 @@ namespace RIP2Image
 					return m_PDF2LowResPDFConverterInstances;
 				case ConversionType.PDF2GrayscalePDF:
 					return m_PDF2GrayscalePDFConverterInstances;
+				case ConversionType.PDF2GrayscaleJPG:
+					return m_PDF2GrayscaleJPGConverterInstances;
+				case ConversionType.PDF2GrayscalePNG:
+					return m_PDF2GrayscalePNGConverterInstances;
+				case ConversionType.PDF2GrayscalePNGSingle:
+					return m_PDF2GrayscalePNGSingleConverterInstances;
 				default:
 					return null;
 			}

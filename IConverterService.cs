@@ -47,6 +47,26 @@ namespace RIP2Image
 							double inQuality);
 
 		/// <summary>
+		/// Convert PDF to Grayscale JPG. 
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+		/// <param name="inNewFileTargetFolderPath">Folder path where the converted file will generate.</param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDF2GrayscaleJPG")]
+		bool ConvertPDF2GrayscaleJPG(string inConvertFilePath,
+									string inNewFileTargetFolderPath,
+									double inResolutionX,
+									double inResolutionY,
+									double inGraphicsAlphaBitsValue,
+									double inTextAlphaBitsValue,
+									double inQuality);
+
+		/// <summary>
 		/// Convert PDF to PNG. 
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
@@ -65,6 +85,24 @@ namespace RIP2Image
 							double inTextAlphaBitsValue);
 
 		/// <summary>
+		/// Convert PDF to Grayscale PNG. 
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+		/// <param name="inNewFileTargetFolderPath">Folder path where the converted file will generate.</param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDF2GrayscalePNG")]
+		bool ConvertPDF2GrayscalePNG(string inConvertFilePath,
+									string inNewFileTargetFolderPath,
+									double inResolutionX,
+									double inResolutionY,
+									double inGraphicsAlphaBitsValue,
+									double inTextAlphaBitsValue);
+
+		/// <summary>
 		/// Convert the first page of the PDF to PNG.  
 		/// </summary>
 		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
@@ -73,7 +111,6 @@ namespace RIP2Image
 		/// <param name="inResolutionY"></param>
 		/// <param name="inGraphicsAlphaBitsValue"></param>
 		/// <param name="inTextAlphaBitsValue"></param>
-		/// <param name="inPageNumToConvert"></param>
 		/// <returns></returns>
 		[OperationContract(Action = "RIP2Image/ConvertPDF2PNGSingle")]
 		bool ConvertPDF2PNGSingle(string inConvertFilePath,
@@ -82,6 +119,24 @@ namespace RIP2Image
 							double inResolutionY,
 							double inGraphicsAlphaBitsValue,
 							double inTextAlphaBitsValue);
+
+		/// <summary>
+		/// Convert the first page of the PDF to Grayscale PNG.  
+		/// </summary>
+		/// <param name="inConvertFilePath">Full path of the file we going to convert.</param>
+		/// <param name="inNewFileTargetPath">Full path of the converted file will generate.</param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDF2GrayscalePNGSingle")]
+		bool ConvertPDF2GrayscalePNGSingle(string inConvertFilePath,
+										string inNewFileTargetPath,
+										double inResolutionX,
+										double inResolutionY,
+										double inGraphicsAlphaBitsValue,
+										double inTextAlphaBitsValue);
 
 		/// <summary>
 		///  Convert PDF to EPS.
@@ -173,7 +228,33 @@ namespace RIP2Image
 								  double inGraphicsAlphaBitsValue,
 								  double inTextAlphaBitsValue,
 								  double inQuality);
-		
+
+		/// <summary>
+		/// Convert all files type under inConvertFolderPath to Grayscale JPG.
+		/// </summary>
+		/// <param name="inConvertFolderPath"></param>
+		/// <param name="inTargetFolderPath"></param>
+		/// <param name="inConvertFileWildCard"></param>
+		/// <param name="inDeleteSourcePDF"></param>
+		/// <param name="inSearchSubFolders"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <param name="inQuality"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDFFolder2GrayscaleJPG")]
+		bool ConvertPDFFolder2GrayscaleJPG(string inConvertFolderPath,
+										  string inTargetFolderPath,
+										  string inConvertFileWildCard,
+										  bool inDeleteSourcePDF,
+										  bool inSearchSubFolders,
+										  double inResolutionX,
+										  double inResolutionY,
+										  double inGraphicsAlphaBitsValue,
+										  double inTextAlphaBitsValue,
+										  double inQuality);
+
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to PNG.
 		/// </summary>
@@ -197,6 +278,30 @@ namespace RIP2Image
 								  double inResolutionY,
 								  double inGraphicsAlphaBitsValue,
 								  double inTextAlphaBitsValue);
+
+		/// <summary>
+		/// Convert all files type under inConvertFolderPath to Grayscale PNG.
+		/// </summary>
+		/// <param name="inConvertFolderPath"></param>
+		/// <param name="inTargetFolderPath"></param>
+		/// <param name="inConvertFileWildCard"></param>
+		/// <param name="inDeleteSourcePDF"></param>
+		/// <param name="inSearchSubFolders"></param>
+		/// <param name="inResolutionX"></param>
+		/// <param name="inResolutionY"></param>
+		/// <param name="inGraphicsAlphaBitsValue"></param>
+		/// <param name="inTextAlphaBitsValue"></param>
+		/// <returns></returns>
+		[OperationContract(Action = "RIP2Image/ConvertPDFFolder2GrayscalePNG")]
+		bool ConvertPDFFolder2GrayscalePNG(string inConvertFolderPath,
+										  string inTargetFolderPath,
+										  string inConvertFileWildCard,
+										  bool inDeleteSourcePDF,
+										  bool inSearchSubFolders,
+										  double inResolutionX,
+										  double inResolutionY,
+										  double inGraphicsAlphaBitsValue,
+										  double inTextAlphaBitsValue);
 
 		/// <summary>
 		/// Convert all files type under inConvertFolderPath to EPS.
