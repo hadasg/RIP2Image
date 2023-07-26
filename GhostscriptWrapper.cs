@@ -112,6 +112,29 @@ namespace RIP2Image
 			}
 		}
 
+		public enum GSDummyInputType
+		{
+			None,
+			EPS,
+			PDF
+		}
+
+		/// <summary>
+		/// Ghostscript dummy input path.
+		/// </summary>
+		private string m_GSDummyInputFile;
+
+		/// <summary>
+		/// Ghostscript dummy input path.
+		/// </summary>
+		public string GSDummyInputFile
+		{
+			get
+			{
+				return m_GSDummyInputFile;
+			}
+		}
+
 		/// <summary>
 		/// Pointer to dynamic loading DLL.
 		/// </summary>
@@ -130,7 +153,7 @@ namespace RIP2Image
 		/// <summary>
 		/// constructor.
 		/// </summary>
-		public GhostscriptWrapper()
+		public GhostscriptWrapper(GSDummyInputType inGSDummyInputType = GSDummyInputType.None)
 		{
 			m_InstanceId = Interlocked.Increment(ref s_InstanceId);
 
@@ -140,6 +163,19 @@ namespace RIP2Image
 			string sourceFile = Path.Combine(assemblyFolder, s_GsDllName + ".dll");
 			m_GSDllFile = Path.Combine(assemblyFolder, "RIP2ImageGSDlls", s_GsDllName + "-" + m_InstanceId.ToString() + ".dll");
 			m_GSDummyOutputFile = Path.Combine(assemblyFolder, "RIP2ImageGSDlls", s_GsDllName + "-" + m_InstanceId.ToString() + "-dummyoutput");
+
+			switch(inGSDummyInputType)
+			{
+				case GSDummyInputType.None:
+					m_GSDummyInputFile = Path.Combine(assemblyFolder, "Empty.none");
+					break;
+				case GSDummyInputType.EPS:
+					m_GSDummyInputFile = Path.Combine(assemblyFolder, "Empty.eps");
+					break;
+				case GSDummyInputType.PDF:
+					m_GSDummyInputFile = Path.Combine(assemblyFolder, "Empty.pdf");
+					break;
+			}
 
 			try
 			{
@@ -211,7 +247,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 				Logger.LogError("GhostscriptWrapper.constructor - gsapi_set_arg_encoding return error {0} for Instance {1}", code.ToString(), m_InstanceId);
 
-			if (ConfigurationManager.AppSettings["redirectstdio"] == "true")
+			if (ConfigurationManager.AppSettings["ReDirectStdio"] == "true")
 			{
 				code = gsapi_set_stdio();
 				if (code != gs_error_type.gs_error_ok)

@@ -89,7 +89,8 @@ namespace RIP2Image
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.png", outputFolder + i.ToString() + ".png");
 				//converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
 				//converter.ConvertPDF2PNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
-				converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", true, true, 72, 72, 2, 4);
+				//converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", true, true, 72, 72, 2, 4);
+				converter.ConvertPDF2GrayscalePDF(inputFolder + "Sample.pdf", outputFolder + "Sample.pdf");
 
 				iterationWatch.Stop();
 				ts = iterationWatch.Elapsed;
@@ -104,7 +105,6 @@ namespace RIP2Image
 			Console.WriteLine("Avrag Run Time: {0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
 
 			InstancesManager.DeleteDynamicLoadingDLL();
-			Console.ReadLine();
 
 			/*
 			Worker workerObject = new Worker();
