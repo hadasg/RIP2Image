@@ -613,10 +613,12 @@ namespace RIP2Image
 				"-dNOPAUSE",                                // Do not prompt and pause for each page.
 				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 															//"-dPDFSETTINGS=/screen",
-				"\"-r72x72\"",
+				"-sDEVICE=pdfwrite",                        // Device name.
+				"-r72x72",
 				"-dDownsampleColorImages=true",
 				"-dDownsampleGrayImages=true",
 				"-dDownsampleMonoImages=true",
+				"-dColorConversionStrategy=/RGB",
 				"-dColorImageResolution=72",
 				"-dGrayImageResolution=72",
 				"-dMonoImageResolution=72",
@@ -649,11 +651,8 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
-			// Make sure proofing to PDF doesn't use independent color spaces (ICCBased) and always renders to RGB
-			command.Append("<< -dColorConversionStrategy=/RGB");
-
 			// Determine new file name.
-			command.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
