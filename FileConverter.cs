@@ -68,6 +68,20 @@ namespace RIP2Image
 		}
 
 		/// <summary>
+		/// Cleanup GhostscriptWrapper.
+		/// </summary>
+		private void Cleanup()
+		{
+			m_NumSequentialConversions = 0;
+			m_LastRunSuccedded = true;
+			if (m_GhostscriptWrapper != null)
+			{
+				m_GhostscriptWrapper.Dispose();
+				m_GhostscriptWrapper = null;
+			}
+		}
+
+		/// <summary>
 		/// dispose implementation
 		/// </summary>
 		/// <param name="disposing"></param>
@@ -88,58 +102,18 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// init if needed
+		/// establish need for initialization
 		/// </summary>
-		private bool InitIfNeeded()
+		private bool IsNeedInitialization()
 		{
 			++m_NumSequentialConversions;
-			
+
 			if (m_LastRunSuccedded && m_NumSequentialConversions < 256 && m_GhostscriptWrapper != null)
-				return true;
+				return false;
 
 			Cleanup();
 
-			switch (m_ConversionType)
-			{
-				case InstancesManager.ConversionType.PDF2PNG:
-					return InitPDF2PNGConversion();
-				case InstancesManager.ConversionType.PDF2PNGSingle:
-					return InitPDF2PNGSingleConversion();
-				case InstancesManager.ConversionType.PDF2JPG:
-					return InitPDF2JPGConversion();
-				case InstancesManager.ConversionType.PDF2EPS:
-					return InitPDF2EPSConversion();
-				case InstancesManager.ConversionType.PDF2LowResPDF:
-					return InitPDF2LowResPDFConversion();
-				case InstancesManager.ConversionType.EPS2PDF:
-					return InitEPS2PDFConversion();
-				case InstancesManager.ConversionType.EPS2LowResPDF:
-					return InitEPS2LowResPDFConversion();
-				case InstancesManager.ConversionType.PDF2GrayscalePDF:
-					return InitPDF2GrayscalePDFConversion();
-				case InstancesManager.ConversionType.PDF2GrayscalePNG:
-					return InitPDF2GrayscalePNGConversion();
-				case InstancesManager.ConversionType.PDF2GrayscalePNGSingle:
-					return InitPDF2GrayscalePNGSingleConversion();
-				case InstancesManager.ConversionType.PDF2GrayscaleJPG:
-					return InitPDF2GrayscaleJPGConversion();
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Cleanup GhostscriptWrapper.
-		/// </summary>
-		private void Cleanup()
-		{
-			m_NumSequentialConversions = 0;
-			m_LastRunSuccedded = true;
-			if (m_GhostscriptWrapper != null)
-			{
-				m_GhostscriptWrapper.Dispose();
-				m_GhostscriptWrapper = null;
-			}
+			return true;
 		}
 
 		/// <summary>
@@ -180,30 +154,6 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
-		/// </summary>
-		private bool InitPDF2JPGConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-sDEVICE=jpeg",                            // what kind of export format i should provide.
-				"-dDOINTERPOLATE"
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2JPGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
-		}
-
-		/// <summary>
 		/// Convert PDF to JPG.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
@@ -216,7 +166,25 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2JPG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-sDEVICE=jpeg",                            // what kind of export format i should provide.
+					"-dDOINTERPOLATE"
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -258,30 +226,6 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
-		/// </summary>
-		private bool InitPDF2GrayscaleJPGConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-sDEVICE=jpeggray",                        // what kind of export format i should provide.
-				"-dDOINTERPOLATE"
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2JPGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
-		}
-
-		/// <summary>
 		/// Convert PDF to JPG.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
@@ -294,7 +238,25 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2GrayscaleJPG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue, double inQuality)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-sDEVICE=jpeggray",                        // what kind of export format i should provide.
+					"-dDOINTERPOLATE"
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2GrayscaleJPG - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -324,7 +286,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				Logger.LogError("FileConverter.ConvertPDF2GrayscaleJPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -333,34 +295,6 @@ namespace RIP2Image
 
 
 			return m_LastRunSuccedded;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNGSingle conversion.
-		/// This method convert only the first page of the PDF to PNG.
-		/// </summary>
-		private bool InitPDF2PNGSingleConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
-				"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
-				"-sDEVICE=pngalpha",                        // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
-				"-dDOINTERPOLATE",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2PNGSingleConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -375,7 +309,28 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2PNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
+					"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
+					"-sDEVICE=pngalpha",                        // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
+					"-dDOINTERPOLATE",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -409,34 +364,6 @@ namespace RIP2Image
 			}
 
 			return m_LastRunSuccedded;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNGSingle conversion.
-		/// This method convert only the first page of the PDF to PNG.
-		/// </summary>
-		private bool InitPDF2GrayscalePNGSingleConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
-				"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
-				"-sDEVICE=pnggray",							// what kind of export format i should provide.
-				"-dDOINTERPOLATE",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2PNGSingleConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -451,7 +378,28 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2GrayscalePNGSingle(string inPathFileToConvert, string inOutputFilePath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
+					"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
+					"-sDEVICE=pnggray",                         // what kind of export format i should provide.
+					"-dDOINTERPOLATE",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2GrayscalePNGSingle - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -477,7 +425,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				Logger.LogError("FileConverter.ConvertPDF2GrayscalePNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -485,30 +433,6 @@ namespace RIP2Image
 			}
 
 			return m_LastRunSuccedded;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNG conversion.
-		/// </summary>
-		private bool InitPDF2PNGConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                          // Ghostscript exe command.
-				"-dNOPAUSE",                            // Do not prompt and pause for each page.
-				"-dNOSAFER",                            // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-sDEVICE=pngalpha",                    // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
-				"-dDOINTERPOLATE"
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2PNGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -523,7 +447,25 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2PNG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                          // Ghostscript exe command.
+					"-dNOPAUSE",                            // Do not prompt and pause for each page.
+					"-dNOSAFER",                            // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-sDEVICE=pngalpha",                    // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
+					"-dDOINTERPOLATE"
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -558,30 +500,6 @@ namespace RIP2Image
 			}
 
 			return m_LastRunSuccedded;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2PNG conversion.
-		/// </summary>
-		private bool InitPDF2GrayscalePNGConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper();
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                          // Ghostscript exe command.
-				"-dNOPAUSE",                            // Do not prompt and pause for each page.
-				"-dNOSAFER",                            // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-sDEVICE=pnggray",                    // what kind of export format i should provide.
-				"-dDOINTERPOLATE"
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2PNGConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -596,7 +514,25 @@ namespace RIP2Image
 		/// <returns>True if conversion succeeded</returns>
 		public bool ConvertPDF2GrayscalePNG(string inPathFileToConvert, string inOutputFolderPath, double inResolutionX, double inResolutionY, double inGraphicsAlphaBitsValue, double inTextAlphaBitsValue)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper();
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                          // Ghostscript exe command.
+					"-dNOPAUSE",                            // Do not prompt and pause for each page.
+					"-dNOSAFER",                            // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-sDEVICE=pnggray",                    // what kind of export format i should provide.
+					"-dDOINTERPOLATE"
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2GrayscalePNG - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -623,7 +559,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				Logger.LogError("FileConverter.ConvertPDF2GrayscalePNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -631,41 +567,6 @@ namespace RIP2Image
 			}
 
 			return m_LastRunSuccedded;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2EPS conversion.
-		/// </summary>
-		private bool InitPDF2EPSConversion()
-		{
-			// Need to implement in the future.
-			// GS has a bug that causes the created EPS file to be lock until quit command called.
-			// In addition, this bug prevents writing for more than one EPS file in a single run.
-			// Therefor, it's impossible to reuse a GS instance many time.
-
-			/*
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-dFirstPage=1",                            // First page to convert in the PDF.
-				"-dLastPage=1",                             // Last page to convert in the PDF.
-				"-sDEVICE=eps2write",                       // Device name.
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2EPSConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return DummyFileOutput(false);
-			*/
-
-			return true;
 		}
 
 		/// <summary>
@@ -678,7 +579,42 @@ namespace RIP2Image
 		/// <returns></returns>
 		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
-			using(GhostscriptWrapper ghostscriptWrapper = new GhostscriptWrapper())
+			// Need to implement in the future.
+			// GS has a bug that causes the created EPS file to be lock until quit command called.
+			// In addition, this bug prevents writing for more than one EPS file in a single run.
+			// Therefor, it's impossible to reuse a GS instance many time.
+
+			/*
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-dFirstPage=1",                            // First page to convert in the PDF.
+					"-dLastPage=1",                             // Last page to convert in the PDF.
+					"-sDEVICE=eps2write",                       // Device name.
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+				else
+				{
+					m_LastRunSuccedded = DummyFileOutput(false);
+				}
+			}
+
+			if (!m_LastRunSuccedded)
+				return false;
+			*/
+
+			using (GhostscriptWrapper ghostscriptWrapper = new GhostscriptWrapper())
 			{
 				gs_error_type code = ghostscriptWrapper.gsapi_init_with_args(
 				"gswin64.exe",												// Ghostscript exe command.
@@ -695,41 +631,11 @@ namespace RIP2Image
 				if (code != gs_error_type.gs_error_ok)
 				{
 					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1} for file {2}", code.ToString(), ghostscriptWrapper.InstanceId, inPathFileToConvert);
-					return false;
+					m_LastRunSuccedded = false;
 				}
 			}
 
 			return true;
-		}
-
-		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for EPS2PDF conversion.
-		/// </summary>
-		private bool InitEPS2PDFConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.EPS);
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-dPDFSETTINGS=/printer",
-				"-sDEVICE=pdfwrite",                        // Device name.
-				"-dEPSFitPage",
-				"-dEPSCrop",
-				"-dCompatibilityLevel=1.4",
-				DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
-				"-dAutoRotatePages=/None",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitEPS2PDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return DummyFileOutput(false);
 		}
 
 		/// <summary>
@@ -740,7 +646,35 @@ namespace RIP2Image
 		/// <returns></returns>
 		public bool ConvertEPS2PDF(string inPathFileToConvert, string inOutputFileFullPath)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.EPS);
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+					"-dPDFSETTINGS=/printer",
+					"-sDEVICE=pdfwrite",                        // Device name.
+					"-dEPSFitPage",
+					"-dEPSCrop",
+					"-dCompatibilityLevel=1.4",
+					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
+					"-dAutoRotatePages=/None",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertEPS2PDF - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+				else
+				{
+					m_LastRunSuccedded = DummyFileOutput(false);
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -766,43 +700,6 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for EPS2LowResPDF conversion.
-		/// </summary>
-		private bool InitEPS2LowResPDFConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.EPS);
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-															//"-dPDFSETTINGS=/screen",
-				"-sDEVICE=pdfwrite",                        // Device name.
-				"-dEPSFitPage",
-				"-dEPSCrop",
-				"-r72x72",
-				"-dDownsampleColorImages=true",
-				"-dDownsampleGrayImages=true",
-				"-dDownsampleMonoImages=true",
-				"-dColorImageResolution=72",
-				"-dGrayImageResolution=72",
-				"-dMonoImageResolution=72",
-				"-dCompatibilityLevel=1.4",
-				DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
-				"-dAutoRotatePages=/None",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitEPS2LowResPDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return DummyFileOutput(false);
-		}
-
-		/// <summary>
 		/// Convert EPS to PDF.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
@@ -810,7 +707,42 @@ namespace RIP2Image
 		/// <returns></returns>
 		public bool ConvertEPS2LowResPDF(string inPathFileToConvert, string inOutputFileFullPath)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.EPS);
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+																//"-dPDFSETTINGS=/screen",
+					"-sDEVICE=pdfwrite",                        // Device name.
+					"-dEPSFitPage",
+					"-dEPSCrop",
+					"-r72x72",
+					"-dDownsampleColorImages=true",
+					"-dDownsampleGrayImages=true",
+					"-dDownsampleMonoImages=true",
+					"-dColorImageResolution=72",
+					"-dGrayImageResolution=72",
+					"-dMonoImageResolution=72",
+					"-dCompatibilityLevel=1.4",
+					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
+					"-dAutoRotatePages=/None",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertEPS2LowResPDF - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+				else
+				{
+					m_LastRunSuccedded = DummyFileOutput(false);
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -836,42 +768,6 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
-		/// </summary>
-		private bool InitPDF2LowResPDFConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-															//"-dPDFSETTINGS=/screen",
-				"-sDEVICE=pdfwrite",                        // Device name.
-				"-r72x72",
-				"-dDownsampleColorImages=true",
-				"-dDownsampleGrayImages=true",
-				"-dDownsampleMonoImages=true",
-				"-dColorConversionStrategy=/RGB",
-				"-dColorImageResolution=72",
-				"-dGrayImageResolution=72",
-				"-dMonoImageResolution=72",
-				"-dCompatibilityLevel=1.4",
-				DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
-				"-dAutoRotatePages=/None",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2LowResPDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return DummyFileOutput(false);
-		}
-
-		/// <summary>
 		/// Convert EPS to PDF.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
@@ -879,7 +775,41 @@ namespace RIP2Image
 		/// <returns></returns>
 		public bool ConvertPDF2LowResPDF(string inPathFileToConvert, string inOutputFileFullPath)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+																//"-dPDFSETTINGS=/screen",
+					"-sDEVICE=pdfwrite",                        // Device name.
+					"-r72x72",
+					"-dDownsampleColorImages=true",
+					"-dDownsampleGrayImages=true",
+					"-dDownsampleMonoImages=true",
+					"-dColorConversionStrategy=/RGB",
+					"-dColorImageResolution=72",
+					"-dGrayImageResolution=72",
+					"-dMonoImageResolution=72",
+					"-dCompatibilityLevel=1.4",
+					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
+					"-dAutoRotatePages=/None",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2LowResPDF - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+				else
+				{
+					m_LastRunSuccedded = DummyFileOutput(false);
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
@@ -905,37 +835,6 @@ namespace RIP2Image
 		}
 
 		/// <summary>
-		/// Initialize GhostscriptWrapper with relevant parameters for PDF2JPG conversion.
-		/// </summary>
-		private bool InitPDF2GrayscalePDFConversion()
-		{
-			// Create the Ghostscript wrapper.
-			m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
-			gs_error_type code = m_GhostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",                              // Ghostscript exe command.
-				"-dNOPAUSE",                                // Do not prompt and pause for each page.
-				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-															//"-dPDFSETTINGS=/screen",
-				"-sDEVICE=pdfwrite",                        // Device name.
-				"-sProcessColorModel=DeviceGray",
-				"-sColorConversionStrategy=Gray",
-				"-dOverrideICC",
-				"-dCompatibilityLevel=1.4",
-				DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
-				"-dAutoRotatePages=/None",
-				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-				);
-
-			if (code != gs_error_type.gs_error_ok)
-			{
-				Logger.LogError("FileConverter.InitPDF2GrayscalePDFConversion - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				return false;
-			}
-
-			return DummyFileOutput(false);
-		}
-
-		/// <summary>
 		/// Convert PDF to Grayscale PDF.
 		/// </summary>
 		/// <param name="inPathFileToConvert"></param>
@@ -943,7 +842,36 @@ namespace RIP2Image
 		/// <returns></returns>
 		public bool ConvertPDF2GrayscalePDF(string inPathFileToConvert, string inOutputFileFullPath)
 		{
-			m_LastRunSuccedded = InitIfNeeded();
+			if (IsNeedInitialization())
+			{
+				m_LastRunSuccedded = true;
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
+				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+					"gswin64.exe",                              // Ghostscript exe command.
+					"-dNOPAUSE",                                // Do not prompt and pause for each page.
+					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+																//"-dPDFSETTINGS=/screen",
+					"-sDEVICE=pdfwrite",                        // Device name.
+					"-sProcessColorModel=DeviceGray",
+					"-sColorConversionStrategy=Gray",
+					"-dOverrideICC",
+					"-dCompatibilityLevel=1.4",
+					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
+					"-dAutoRotatePages=/None",
+					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					);
+
+				if (init_code != gs_error_type.gs_error_ok)
+				{
+					Logger.LogError("FileConverter.ConvertPDF2GrayscalePDF - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
+					m_LastRunSuccedded = false;
+				}
+				else
+				{
+					m_LastRunSuccedded = DummyFileOutput(false);
+				}
+			}
+
 			if (!m_LastRunSuccedded)
 				return false;
 
