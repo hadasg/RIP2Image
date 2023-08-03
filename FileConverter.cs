@@ -580,59 +580,41 @@ namespace RIP2Image
 		public bool ConvertPDF2EPS(string inPathFileToConvert, string inOutputFileFullPath, double inFirstPageToConvert, double inLastPageToConvert)
 		{
 			// Need to implement in the future.
-			// GS has a bug that causes the created EPS file to be lock until quit command called.
-			// In addition, this bug prevents writing for more than one EPS file in a single run.
-			// Therefor, it's impossible to reuse a GS instance many time.
+			// GS has a bug that causes the created EPS file to be lock until exit command called.
+			// So we employ deferent strategy
 
-			/*
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
 				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
-				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
-					"gswin64.exe",                              // Ghostscript exe command.
-					"-dNOPAUSE",                                // Do not prompt and pause for each page.
-					"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-					"-dFirstPage=1",                            // First page to convert in the PDF.
-					"-dLastPage=1",                             // Last page to convert in the PDF.
-					"-sDEVICE=eps2write",                       // Device name.
-					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
-					);
-
-				if (init_code != gs_error_type.gs_error_ok)
-				{
-					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1}", init_code.ToString(), m_GhostscriptWrapper.InstanceId);
-					m_LastRunSuccedded = false;
-				}
-				else
-				{
-					m_LastRunSuccedded = DummyFileOutput(false);
-				}
 			}
 
-			if (!m_LastRunSuccedded)
-				return false;
-			*/
-
-			using (GhostscriptWrapper ghostscriptWrapper = new GhostscriptWrapper())
-			{
-				gs_error_type code = ghostscriptWrapper.gsapi_init_with_args(
-				"gswin64.exe",												// Ghostscript exe command.
-				"-dNOPAUSE",												// Do not prompt and pause for each page.
-				"-dNOSAFER",												// This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
-				"-dBATCH",													// Terminate when accomplish.
+			gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
+				"gswin64.exe",                                              // Ghostscript exe command.
+				"-dNOPAUSE",                                                // Do not prompt and pause for each page.
+				"-dNOSAFER",                                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+				"-dBATCH",                                                  // Terminate when accomplish.
 				"-dFirstPage=" + Convert.ToInt32(inFirstPageToConvert),     // First page to convert in the PDF.
 				"-dLastPage=" + Convert.ToInt32(inLastPageToConvert),       // Last page to convert in the PDF.
 				"-sDEVICE=eps2write",                                       // Device name.
-				"-sOutputFile=" + inOutputFileFullPath,						// Where to write the output.
-				inPathFileToConvert											// File to convert.
+				"-sOutputFile=" + inOutputFileFullPath,                     // Where to write the output.
+				inPathFileToConvert                                         // File to convert.
 				);
 
-				if (code != gs_error_type.gs_error_ok)
-				{
-					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1} for file {2}", code.ToString(), ghostscriptWrapper.InstanceId, inPathFileToConvert);
-					m_LastRunSuccedded = false;
-				}
+			if (init_code != gs_error_type.gs_error_ok)
+			{
+				Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1} for file {2}", init_code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				m_LastRunSuccedded = false;
+				return false;
+			}
+
+			gs_error_type exit_code = m_GhostscriptWrapper.gsapi_exit();
+
+			if (exit_code != gs_error_type.gs_error_ok)
+			{
+				Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1} for file {2}", exit_code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
 			return true;

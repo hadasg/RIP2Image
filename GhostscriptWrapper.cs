@@ -151,6 +151,11 @@ namespace RIP2Image
 		private string m_LogErrorMessagePart;
 
 		/// <summary>
+		/// Indication that init was called and exit was not
+		/// </summary>
+		private bool m_NeedExit = false;
+
+		/// <summary>
 		/// constructor.
 		/// </summary>
 		public GhostscriptWrapper(GSDummyInputType inGSDummyInputType = GSDummyInputType.None)
@@ -263,9 +268,12 @@ namespace RIP2Image
 		{
 			if (m_Instance != IntPtr.Zero)
 			{
-				gs_error_type code = gsapi_exit();
-				if(code != gs_error_type.gs_error_ok)
-					Logger.LogError("GhostscriptWrapper.Dispose - gsapi_exit return error {0} for Instance {1}", code.ToString(), m_InstanceId);
+				if (m_NeedExit)
+				{
+					gs_error_type code = gsapi_exit();
+					if (code != gs_error_type.gs_error_ok)
+						Logger.LogError("GhostscriptWrapper.Dispose - gsapi_exit return error {0} for Instance {1}", code.ToString(), m_InstanceId);
+				}
 
 				gsapi_delete_instance();
 			}
@@ -478,6 +486,8 @@ namespace RIP2Image
 
 		public gs_error_type gsapi_init_with_args(params string[] args)
 		{
+			m_NeedExit = true;
+
 			GCHandle[] argsGCHandles = new GCHandle[args.Length];
 			IntPtr[] argsPtrs = new IntPtr[args.Length];
 			for (int i = 0; i < args.Length; ++i)
@@ -501,8 +511,9 @@ namespace RIP2Image
 
 		private gsapi_exit_delegate m_gsapi_exit;
 
-		private gs_error_type gsapi_exit()
+		public gs_error_type gsapi_exit()
 		{
+			m_NeedExit = false;
 			return (gs_error_type)m_gsapi_exit(m_Instance);
 		}
 
