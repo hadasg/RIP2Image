@@ -173,7 +173,6 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				Logger.LogError("FileConverter.DummyFileOutput - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
-				Logger.LogError(command.ToString());
 				return false;
 			}
 
@@ -247,7 +246,7 @@ namespace RIP2Image
 			if(code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded =  false;
-				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -325,7 +324,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -402,7 +401,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -478,7 +477,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -551,7 +550,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -624,7 +623,7 @@ namespace RIP2Image
 			if (code != gs_error_type.gs_error_ok)
 			{
 				m_LastRunSuccedded = false;
-				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 			}
 			else
 			{
@@ -651,6 +650,8 @@ namespace RIP2Image
 				"gswin64.exe",                              // Ghostscript exe command.
 				"-dNOPAUSE",                                // Do not prompt and pause for each page.
 				"-dNOSAFER",                                // This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
+				"-dFirstPage=1",                            // First page to convert in the PDF.
+				"-dLastPage=1",                             // Last page to convert in the PDF.
 				"-sDEVICE=eps2write",                       // Device name.
 				"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
 				);
@@ -693,7 +694,7 @@ namespace RIP2Image
 
 				if (code != gs_error_type.gs_error_ok)
 				{
-					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+					Logger.LogError("FileConverter.ConvertPDF2EPS - gsapi_init_with_args return error {0} for Instance {1} for file {2}", code.ToString(), ghostscriptWrapper.InstanceId, inPathFileToConvert);
 					return false;
 				}
 			}
@@ -755,7 +756,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.ConvertEPS2PDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertEPS2PDF - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 				m_LastRunSuccedded = false;
 				return false;
 			}
@@ -825,7 +826,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.ConvertEPS2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertEPS2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 				m_LastRunSuccedded = false;
 				return false;
 			}
@@ -894,7 +895,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.ConvertPDF2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2LowResPDF - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 				m_LastRunSuccedded = false;
 				return false;
 			}
@@ -958,7 +959,7 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				Logger.LogError("FileConverter.ConvertPDF2GrayscalePDF - gsapi_run_string_with_length return error {0} for Instance {1}", code.ToString(), m_GhostscriptWrapper.InstanceId);
+				Logger.LogError("FileConverter.ConvertPDF2GrayscalePDF - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
 				m_LastRunSuccedded = false;
 				return false;
 			}
