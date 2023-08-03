@@ -287,7 +287,8 @@ namespace RIP2Image
 
 				try
 				{
-					File.Delete(m_GSDummyOutputFile);
+					if(File.Exists(m_GSDummyOutputFile))
+						File.Delete(m_GSDummyOutputFile);
 				}
 				catch (System.Exception ex)
 				{
@@ -597,7 +598,7 @@ namespace RIP2Image
 
 		private int stdin_callback(IntPtr handle, IntPtr pointer, int count)
 		{
-			Marshal.PtrToStringAnsi(pointer);
+			Marshal.PtrToStringAnsi(pointer, count);
 			return count;
 		}
 
@@ -605,7 +606,7 @@ namespace RIP2Image
 
 		private int stdout_callback(IntPtr handle, IntPtr pointer, int count)
 		{
-			string message = Marshal.PtrToStringAnsi(pointer);
+			string message = Marshal.PtrToStringAnsi(pointer, count);
 			if (string.IsNullOrEmpty(message))
 				return count;
 
@@ -629,7 +630,7 @@ namespace RIP2Image
 
 		private int stderr_callback(IntPtr handle, IntPtr pointer, int count)
 		{
-			string message = Marshal.PtrToStringAnsi(pointer);
+			string message = Marshal.PtrToStringAnsi(pointer, count);
 			if (string.IsNullOrEmpty(message))
 				return count;
 
