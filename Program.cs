@@ -73,25 +73,30 @@ namespace RIP2Image
 			TimeSpan ts;
 			stopWatch.Start();
 
+			bool retVal = false;
 			ConverterService converter = new ConverterService();
 			for (int i = 1; i <= numRepeats; ++i)
 			{
 				iterationWatch.Reset();
 				iterationWatch.Start();
 
-				//converter.ConvertPDF2JPG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 1, 1, 72);
-				//converter.ConvertPDF2EPS(inputFolder + "Sample.pdf", outputFolder + i.ToString() + ".ps",1,1);
-				//converter.ConvertEPS2PDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + ".pdf");
-				//converter.ConvertEPS2LowResPDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + "_lowres.pdf");
-				//converter.ConvertImage2LowResImage(inputFolder + "ImageTest.jpg", inputFolder + i.ToString() + ".jpg");
-				//converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
-				//converter.ConvertImage2LowResImage(inputFolder + "Sample.jpg", outputFolder + i.ToString() + ".jpg");
-				//converter.ConvertImage2LowResImage(inputFolder + "Sample.png", outputFolder + i.ToString() + ".png");
-				//converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
-				//converter.ConvertPDF2PNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
-				//converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", true, true, 72, 72, 2, 4);
-				//converter.ConvertPDF2GrayscalePDF(inputFolder + "Sample.pdf", outputFolder + "Sample.pdf");
-				converter.ConvertPDF2JPG(inputFolder + "Sample2.pdf", outputFolder, 72, 72, 1, 1, 72);
+				//retVal = converter.ConvertPDF2JPG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 1, 1, 72);
+				//retVal = converter.ConvertPDF2GrayscaleJPG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 1, 1, 72);
+				//retVal = converter.ConvertPDF2EPS(inputFolder + "Sample.pdf", outputFolder + i.ToString() + ".ps",1,1);
+				//retVal = converter.ConvertEPS2PDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + ".pdf");
+				//retVal = converter.ConvertEPS2LowResPDF(outputFolder + i.ToString() + ".ps", outputFolder + i.ToString() + "_lowres.pdf");
+				//retVal = converter.ConvertImage2LowResImage(inputFolder + "ImageTest.jpg", inputFolder + i.ToString() + ".jpg");
+				//retVal = converter.ConvertImage2LowResImage(inputFolder + "Sample.TIF", outputFolder + i.ToString() + ".tif");
+				//retVal = converter.ConvertImage2LowResImage(inputFolder + "Sample.jpg", outputFolder + i.ToString() + ".jpg");
+				//retVal = converter.ConvertImage2LowResImage(inputFolder + "Sample.png", outputFolder + i.ToString() + ".png");
+				//retVal = converter.ConvertImage2LowResImage(inputFolder + "Sample.gif", outputFolder + i.ToString() + ".gif");
+				//retVal = converter.ConvertPDF2PNG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 2, 4);
+				//retVal = converter.ConvertPDF2GrayscalePNG(inputFolder + "Sample.pdf", outputFolder, 72, 72, 2, 4);
+				//retVal = converter.ConvertPDF2PNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
+				//retVal = converter.ConvertPDF2GrayscalePNGSingle(inputFolder + "Sample.pdf", outputFolder + "Sample.png", 72, 72, 2, 4);
+				//retVal = converter.ConvertPDFFolder2PNG(inputFolder, outputFolder, "*.pdf", false, true, 72, 72, 2, 4);
+				//retVal = converter.ConvertPDF2GrayscalePDF(inputFolder + "Sample.pdf", outputFolder + "Sample.pdf");
+				//retVal = converter.ConvertPDF2JPG(inputFolder + "Sample2.pdf", outputFolder, 72, 72, 1, 1, 72);
 
 				iterationWatch.Stop();
 				ts = iterationWatch.Elapsed;

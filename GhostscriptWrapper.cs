@@ -158,7 +158,7 @@ namespace RIP2Image
 		/// <summary>
 		/// constructor.
 		/// </summary>
-		public GhostscriptWrapper(GSDummyInputType inGSDummyInputType = GSDummyInputType.None)
+		public GhostscriptWrapper(GSDummyInputType inGSDummyInputType)
 		{
 			m_InstanceId = Interlocked.Increment(ref s_InstanceId);
 

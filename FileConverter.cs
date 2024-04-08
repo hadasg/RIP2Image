@@ -169,7 +169,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                              // Ghostscript exe command.
 					"-dNOPAUSE",                                // Do not prompt and pause for each page.
@@ -190,21 +190,27 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file quality the range is 0-100.
-			command.Append("mark /JPEGQ " + inQuality + " currentdevice putdeviceprops ");
+			command.Append(" /JPEGQ " + inQuality);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
 			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.jpg";
-			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -213,15 +219,12 @@ namespace RIP2Image
 
 			if(code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded =  false;
 				Logger.LogError("FileConverter.ConvertPDF2JPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
+				m_LastRunSuccedded =  false;
+				return false;
 			}
-			else
-			{
-				m_LastRunSuccedded = true;
-			}
-			
 
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -241,7 +244,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                              // Ghostscript exe command.
 					"-dNOPAUSE",                                // Do not prompt and pause for each page.
@@ -262,21 +265,27 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file quality the range is 0-100.
-			command.Append("mark /JPEGQ " + inQuality + " currentdevice putdeviceprops ");
+			command.Append(" /JPEGQ " + inQuality);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
 			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.jpg";
-			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -285,15 +294,12 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded = false;
 				Logger.LogError("FileConverter.ConvertPDF2GrayscaleJPG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
-			}
-			else
-			{
-				m_LastRunSuccedded = true;
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
-
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -312,7 +318,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                              // Ghostscript exe command.
 					"-dNOPAUSE",                                // Do not prompt and pause for each page.
@@ -320,8 +326,7 @@ namespace RIP2Image
 					"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
 					"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
 					"-sDEVICE=pngalpha",                        // what kind of export format i should provide, in this case "pngalpha" for transparent PNG.
-					"-dDOINTERPOLATE",
-					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					"-dDOINTERPOLATE"
 					);
 
 				if (init_code != gs_error_type.gs_error_ok)
@@ -336,17 +341,26 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
+			// setting the output device
+			command.Append(" /OutputDevice /pngalpha");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -355,14 +369,12 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded = false;
 				Logger.LogError("FileConverter.ConvertPDF2PNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
-			}
-			else
-			{
-				m_LastRunSuccedded = true;
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -381,7 +393,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                              // Ghostscript exe command.
 					"-dNOPAUSE",                                // Do not prompt and pause for each page.
@@ -389,8 +401,7 @@ namespace RIP2Image
 					"-dFirstPage=1",                            // Convert only the first page of the PDF to PNG.
 					"-dLastPage=1",                             // Convert only the first page of the PDF to PNG.
 					"-sDEVICE=pnggray",                         // what kind of export format i should provide.
-					"-dDOINTERPOLATE",
-					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
+					"-dDOINTERPOLATE"
 					);
 
 				if (init_code != gs_error_type.gs_error_ok)
@@ -405,17 +416,23 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -424,14 +441,12 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded = false;
 				Logger.LogError("FileConverter.ConvertPDF2GrayscalePNGSingle - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
-			}
-			else
-			{
-				m_LastRunSuccedded = true;
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -450,7 +465,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                          // Ghostscript exe command.
 					"-dNOPAUSE",                            // Do not prompt and pause for each page.
@@ -471,18 +486,24 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
 			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.png";
-			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -491,14 +512,12 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded = false;
 				Logger.LogError("FileConverter.ConvertPDF2PNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
-			}
-			else
-			{
-				m_LastRunSuccedded = true;
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -517,7 +536,7 @@ namespace RIP2Image
 			if (IsNeedInitialization())
 			{
 				m_LastRunSuccedded = true;
-				m_GhostscriptWrapper = new GhostscriptWrapper();
+				m_GhostscriptWrapper = new GhostscriptWrapper(GSDummyInputType.PDF);
 				gs_error_type init_code = m_GhostscriptWrapper.gsapi_init_with_args(
 					"gswin64.exe",                          // Ghostscript exe command.
 					"-dNOPAUSE",                            // Do not prompt and pause for each page.
@@ -538,18 +557,24 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine rasterization graphic quality - values are 1, 2 or 4.
-			command.Append("mark /GraphicsAlphaBits " + inGraphicsAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /GraphicsAlphaBits " + inGraphicsAlphaBitsValue);
 
 			// Determine rasterization text quality - values are 1, 2 or 4.
-			command.Append("mark /TextAlphaBits " + inTextAlphaBitsValue + " currentdevice putdeviceprops ");
+			command.Append(" /TextAlphaBits " + inTextAlphaBitsValue);
 
 			// Determine file resolution.
-			command.Append("<< /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "] >> setpagedevice ");
+			command.Append(" /HWResolution [" + inResolutionX.ToString() + " " + inResolutionY.ToString() + "]");
 
 			// Determine new file name.
 			string outputFilePath = inOutputFolderPath + "\\" + Path.GetFileNameWithoutExtension(inPathFileToConvert) + "-%d.png";
-			command.Append("<< /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + outputFilePath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -558,14 +583,12 @@ namespace RIP2Image
 
 			if (code != gs_error_type.gs_error_ok)
 			{
-				m_LastRunSuccedded = false;
 				Logger.LogError("FileConverter.ConvertPDF2GrayscalePNG - gsapi_run_string_with_length return error {0} for Instance {1} for file {2}", code.ToString(), m_GhostscriptWrapper.InstanceId, inPathFileToConvert);
-			}
-			else
-			{
-				m_LastRunSuccedded = true;
+				m_LastRunSuccedded = false;
+				return false;
 			}
 
+			m_LastRunSuccedded = DummyFileOutput(true);
 			return m_LastRunSuccedded;
 		}
 
@@ -640,7 +663,7 @@ namespace RIP2Image
 					"-sDEVICE=pdfwrite",                        // Device name.
 					"-dEPSFitPage",
 					"-dEPSCrop",
-					"-dCompatibilityLevel=1.4",
+					"-dCompatibilityLevel=1.5",
 					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
 					"-dAutoRotatePages=/None",
 					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
@@ -662,8 +685,14 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -708,7 +737,7 @@ namespace RIP2Image
 					"-dColorImageResolution=72",
 					"-dGrayImageResolution=72",
 					"-dMonoImageResolution=72",
-					"-dCompatibilityLevel=1.4",
+					"-dCompatibilityLevel=1.5",
 					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
 					"-dAutoRotatePages=/None",
 					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
@@ -730,8 +759,14 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -775,7 +810,7 @@ namespace RIP2Image
 					"-dColorImageResolution=72",
 					"-dGrayImageResolution=72",
 					"-dMonoImageResolution=72",
-					"-dCompatibilityLevel=1.4",
+					"-dCompatibilityLevel=1.5",
 					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
 					"-dAutoRotatePages=/None",
 					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
@@ -797,8 +832,14 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
@@ -837,7 +878,7 @@ namespace RIP2Image
 					"-sProcessColorModel=DeviceGray",
 					"-sColorConversionStrategy=Gray",
 					"-dOverrideICC",
-					"-dCompatibilityLevel=1.4",
+					"-dCompatibilityLevel=1.5",
 					DetectDuplicateImages ? "-dDetectDuplicateImages=true" : "-dDetectDuplicateImages=false",
 					"-dAutoRotatePages=/None",
 					"-sOutputFile=" + m_GhostscriptWrapper.GSDummyOutputFile   // we must set the output at init stage, so we put a junk file, just for the init to successes
@@ -859,8 +900,14 @@ namespace RIP2Image
 
 			StringBuilder command = new StringBuilder();
 
+			// start the page device properties setup dictionary
+			command.Append("<<");
+
 			// Determine new file name.
-			command.Append("<< /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ") >> setpagedevice ");
+			command.Append(" /OutputFile (" + inOutputFileFullPath.Replace("\\", "\\\\") + ")");
+
+			// end the page device properties setup dictionary
+			command.Append(" >> setpagedevice ");
 
 			// Convert file type.
 			command.Append("(" + inPathFileToConvert.Replace("\\", "\\\\") + ") run ");
